@@ -8,16 +8,20 @@ class AttrDict(dict):
         super(AttrDict, self).__init__(*args, **kwargs)
         self.__dict__ = self
 
+
 class NameObject(object):
 
     name = ""
 
     def __init__(self, *args, **kwargs):
         self.name = self.name or self.clsname()
-        super(NameObject, self).__init__(*args, **kwargs)
-        
-    def __unicode__(self):
+        super(NameObject, self).__init__()
+
+    def __str__(self):
         return self.name
+
+    def __repr__(self):
+        return str(self)
 
     @classmethod
     def clsname(cls):

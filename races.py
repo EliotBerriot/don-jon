@@ -3,13 +3,13 @@ from utils import NameObject
 
 
 class Race(BaseAttribute):
-    pass
+    chosen = True
 
 
 class BaseRace(NameObject):
     pass
 
-    
+
 class Elf(BaseRace):
 
     modify = {

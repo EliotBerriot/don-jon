@@ -2,6 +2,8 @@ import unittest
 from chars import BaseCharacter, Character
 from races import Elf
 from attributes import DefaultAttributesManager
+
+
 class CharacterTestCase(unittest.TestCase):
 
 
@@ -41,6 +43,6 @@ class CharacterTestCase(unittest.TestCase):
         self.assertEqual(b.attributes('dexterity').value, 21)
         self.assertEqual(b.attributes('constitution').value, 13)
 
-        
+
 if __name__ == "__main__":
     unittest.main()

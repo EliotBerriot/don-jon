@@ -4,7 +4,7 @@ class BaseAttribute(NameObject):
     
     modify = {}
     default = None
-
+    chosen = False
     def __init__(self, character=None, value=None, **kwargs):
         self.modifiers = {}
         self.character = character
@@ -12,8 +12,6 @@ class BaseAttribute(NameObject):
             self._value = value
         else:
             self._value = self.default
-
-   
 
 
     @property
@@ -26,6 +24,14 @@ class BaseAttribute(NameObject):
     @value.setter
     def value(self, value):
         self._value = value
+
+    def __str__(self):
+        return str(self.value)
+        
+    def __repr__(self):
+        if self.chosen:
+            return self.value.__repr__()
+        return str(self.value)
 
 # Global
 

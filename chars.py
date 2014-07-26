@@ -4,6 +4,7 @@ from utils import NameObject
 class BaseCharacter(NameObject):
 
     def __init__(self, *args, **kwargs):
+        super(BaseCharacter, self).__init__(*args, **kwargs)
         self.attributes = DefaultAttributesManager(character=self, **kwargs)
         
 
@@ -12,5 +13,18 @@ class Character(BaseCharacter):
     def __init__(self, *args, **kwargs):
         super(Character, self).__init__(*args, **kwargs)
 
-    def __unicode__(self):
-        return u"{0} - {1}".format(self.name, self.attributes('race'))
+    def display(self):
+
+        for section, attributes in self.attributes._attributes_list.items():
+            print('{0}\n{1}\n'.format(section, "*" * len(section)))
+
+            for a in attributes:
+                attribute = self.attributes(a.clsname())
+                key = attribute.clsname()
+                if isinstance(attribute.value, type):
+                    value = attribute.value.clsname()
+                else:
+                    value = attribute.value
+                print('{0}: {1}'.format(key, value))
+
+            print('\n')

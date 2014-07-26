@@ -8,7 +8,7 @@ default_attributes = AttrOrderedDict()
 
 default_attributes['global'] = (
     Level,  
-    Race,  
+    Race,
 )
 
 default_attributes['defense'] = (
@@ -47,16 +47,27 @@ class DefaultAttributesManager(dict):
                 if self.get(attribute.clsname(), Empty) != Empty:
                     # an attribute with the same name alredy exists !
                     raise ValueError('You declared the same attribute twice')
+
                 self[attribute.clsname()] = attribute(value=self.kwargs.get(attribute.clsname(), None))
         
     def setup_modifiers(self):
         for name, attribute in self.items():
-             for modified_attribute, modifier_function in attribute.modify.items():
+            if attribute.chosen:
+                # race, gifts, etc.
+                try:
+                    modifiers = attribute.value.modify.items()
+                except AttributeError:
+                    # no value has been set
+                    pass
+            else:
+                # commons attributes (strength, armor, etc.)
+                modifiers = attribute.modify.items()
+
+            for modified_attribute, modifier_function in modifiers:
                 if hasattr(modifier_function, '__call__'):
                     # a lambda or a callback was passed to modify
                     f = modifier_function
                 else:
                     # a string was passed, try to look for a method with the same name on the attribute
                     f = getattr(attribute, modifier_function)
-                print(self('race').value)
                 self(modified_attribute).modifiers[modifier_function] = f
