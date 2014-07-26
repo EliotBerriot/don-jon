@@ -1,4 +1,16 @@
 import random
+from collections import OrderedDict
+
+
+class AttrDict(dict):
+    def __init__(self, *args, **kwargs):
+        super(AttrDict, self).__init__(*args, **kwargs)
+        self.__dict__ = self
+
+
+class AttrOrderedDict(OrderedDict):
+    pass
+
 
 class D:
 

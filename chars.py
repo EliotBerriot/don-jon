@@ -1,5 +1,4 @@
-from utils import autoassign
-
+from attributes import DefaultAttributesManager
 
 class BaseCharacter(object):
 
@@ -15,22 +14,15 @@ class BaseCharacter(object):
 
     level = 1
 
-    @autoassign('level', 'attributes')
     def __init__(self, *args, **kwargs):
-
-        self.attributes = dict(self.base_attributes.items() + kwargs.get('attributes', {}).items())
-        for a, v in self.attributes.items():
-            setattr(self, a, v)
-
-    def attribute_mod(self, attribute):
-        return (getattr(self, attribute) / 2) - 5
+        self.attributes = DefaultAttributesManager(character=self, **kwargs)
+        
 
 class Character(BaseCharacter):
 
     race = None
 
-    @autoassign('race')
     def __init__(self, *args, **kwargs):
         super(Character, self).__init__(*args, **kwargs)
-        for a, v in self.race.attributes.items():
-            setattr(self, a, getattr(self, a) + v) 
+        # for a, v in self.race.attributes.items():
+        #     setattr(self, a, getattr(self, a) + v) 
