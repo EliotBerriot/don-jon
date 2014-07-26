@@ -1,5 +1,6 @@
+from utils import NameObject
 
-class BaseAttribute(object):
+class BaseAttribute(NameObject):
     
     modify = {}
     default = None
@@ -12,13 +13,8 @@ class BaseAttribute(object):
         else:
             self._value = self.default
 
-    @classmethod
-    def clsname(cls):
-        return cls.__name__.lower()
+   
 
-    @property
-    def name(self):
-        return self.__class__.clsname(self.__class__)
 
     @property
     def value(self):
@@ -36,6 +32,8 @@ class BaseAttribute(object):
 class Level(BaseAttribute):
     default = 1
 
+class Race(BaseAttribute):
+    default = None
 # Abilities 
 
 class Ability(BaseAttribute):

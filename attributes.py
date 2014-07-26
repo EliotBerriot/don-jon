@@ -1,13 +1,14 @@
 from utils import AttrDict, AttrOrderedDict
 from builtin_attributes import *
-
+from races import *
 class Empty:
     pass
 
 default_attributes = AttrOrderedDict()
 
 default_attributes['global'] = (
-    Level,    
+    Level,  
+    Race,  
 )
 
 default_attributes['defense'] = (
@@ -21,6 +22,7 @@ default_attributes['abilities'] = (
     Wisdom,
     Intelligence,
     Charisma,    
+    
 )
 
 
@@ -50,4 +52,11 @@ class DefaultAttributesManager(dict):
     def setup_modifiers(self):
         for name, attribute in self.items():
              for modified_attribute, modifier_function in attribute.modify.items():
-                self(modified_attribute).modifiers[modifier_function] = getattr(attribute, modifier_function)
+                if hasattr(modifier_function, '__call__'):
+                    # a lambda or a callback was passed to modify
+                    f = modifier_function
+                else:
+                    # a string was passed, try to look for a method with the same name on the attribute
+                    f = getattr(attribute, modifier_function)
+                print(self('race').value)
+                self(modified_attribute).modifiers[modifier_function] = f

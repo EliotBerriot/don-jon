@@ -1,11 +1,30 @@
 import random
 from collections import OrderedDict
 
+ugettext_lazy = lambda s: s
 
 class AttrDict(dict):
     def __init__(self, *args, **kwargs):
         super(AttrDict, self).__init__(*args, **kwargs)
         self.__dict__ = self
+
+class NameObject(object):
+
+    name = ""
+
+    def __init__(self, *args, **kwargs):
+        self.name = self.name or self.clsname()
+        super(NameObject, self).__init__(*args, **kwargs)
+        
+    def __unicode__(self):
+        return self.name
+
+    @classmethod
+    def clsname(cls):
+        if isinstance(cls, type):
+            return cls.__name__.lower()
+        # was called with an instance instead of  class
+        return cls.__class__.__name__.lower()
 
 
 class AttrOrderedDict(OrderedDict):

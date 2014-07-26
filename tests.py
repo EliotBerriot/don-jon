@@ -26,7 +26,7 @@ class CharacterTestCase(unittest.TestCase):
 
     def test_attributes_objects_can_declare_modifiers_on_other_attributes(self):
 
-        b = Character(race=Elf, dexterity=19, constitution=15)
+        b = Character(dexterity=19, constitution=15)
 
         self.assertEqual(b.attributes('armor_class').value, 10 + b.attributes('dexterity').mod)
 
@@ -35,5 +35,12 @@ class CharacterTestCase(unittest.TestCase):
         d = DefaultAttributesManager(character=b)
         self.assertEqual(d('strength').value, 10)
 
+    def test_race(self):
+
+        b = Character(race=Elf, dexterity=19, constitution=15)
+        self.assertEqual(b.attributes('dexterity').value, 21)
+        self.assertEqual(b.attributes('constitution').value, 13)
+
+        
 if __name__ == "__main__":
     unittest.main()

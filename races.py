@@ -1,11 +1,18 @@
+from builtin_attributes import BaseAttribute
+from utils import NameObject
 
-class Race(object):
+
+class Race(BaseAttribute):
     pass
 
 
-class Elf(Race):
+class BaseRace(NameObject):
+    pass
 
-    attributes = {
-        "dexterity": 2,
-        "constitution": -2,
+    
+class Elf(BaseRace):
+
+    modify = {
+        "dexterity": lambda original_value: original_value + 2,
+        "constitution": lambda original_value: original_value - 2,
     }

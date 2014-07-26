@@ -1,18 +1,7 @@
 from attributes import DefaultAttributesManager
+from utils import NameObject
 
-class BaseCharacter(object):
-
-    base_attributes = {
-        "strength": 10,
-        "dexterity": 10,
-        "constitution": 10,
-        "intelligence": 10,
-        "wisdom": 10,
-        "charisma": 10,    
-    }
-    attributes = {}
-
-    level = 1
+class BaseCharacter(NameObject):
 
     def __init__(self, *args, **kwargs):
         self.attributes = DefaultAttributesManager(character=self, **kwargs)
@@ -20,9 +9,8 @@ class BaseCharacter(object):
 
 class Character(BaseCharacter):
 
-    race = None
-
     def __init__(self, *args, **kwargs):
         super(Character, self).__init__(*args, **kwargs)
-        # for a, v in self.race.attributes.items():
-        #     setattr(self, a, getattr(self, a) + v) 
+
+    def __unicode__(self):
+        return u"{0} - {1}".format(self.name, self.attributes('race'))
