@@ -1,11 +1,33 @@
 from PySide import QtGui
 
+class BaseField(object):
+    label = ""
+    def __init__(self, *args, **kwargs):
+        self.label = kwargs.get('label', '')
+        self.initial = kwargs.get('initial')
+        super(BaseField, self).__init__()
+        self.default = kwargs.get('default')
+        if self.default is not None:
+            self.value = self.default
 
-class SingleChoice(QtGui.QComboBox):
+    def display(self, **kwargs):
+        return self.label + " : ", self
 
-    def __init__(self, initial=[], parent=None, **kwargs):
-        super(SingleChoice, self).__init__(parent)
-        self.initial = initial
+
+class IntegerField(BaseField, QtGui.QSpinBox):
+    @property
+    def value(self):
+        return super(IntegerField, self).value()
+
+    @value.setter
+    def value(self, new_value):
+        return self.setValue(new_value)
+
+
+class SingleChoiceField(BaseField, QtGui.QComboBox):
+
+    def __init__(self, *args, **kwargs):
+        super(SingleChoiceField, self).__init__(*args, **kwargs)
         l = [i.verbose_name for i in self.initial]
         self.addItems(l)
 

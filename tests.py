@@ -3,6 +3,7 @@ from don_jon.chars import BaseCharacter, Character, CharacterGenerator
 from don_jon.races import Elf, Human
 from don_jon.attributes import DefaultAttributesManager
 from don_jon.registries import attributes, races
+from don_jon.forms import CharacterForm
 from PySide import QtGui
 import sys
 
@@ -76,7 +77,14 @@ class FormsTestCase(unittest.TestCase):
         field.value = Human
         self.assertEqual(field.currentText(), "Humain")
 
+    def test_can_create_character_from_form(self):
 
+        form = CharacterForm()
+        form.fields['race'].value = Human
+        form.fields['level'].value = 26
+        character = form.process()
+        self.assertEqual(character.attributes('race').value, Human)
+        self.assertEqual(character.attributes('level').value, 26)
 
 if __name__ == "__main__":
 

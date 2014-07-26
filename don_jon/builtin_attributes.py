@@ -8,6 +8,7 @@ class BaseAttribute(NameObject):
     default = None
     chosen = False
     field = None
+    initial = None
     def __init__(self, character=None, value=None, **kwargs):
         self.modifiers = {}
         self.character = character
@@ -41,26 +42,23 @@ class BaseAttribute(NameObject):
         """
         Return initial data for form field
         """
-        raise NotImplementedError
-
-    def form_row(self, **kwargs):
-        return self.verbose_name + " : ", self.form_field()
-
+        return self.initial
+    
     def form_field(self, **kwargs):
-        return self.field(initial=self.get_initial_data())
+        return self.field(initial=self.get_initial_data(), label=self.verbose_name)
 
 class IntAttribute(BaseAttribute):
-    pass
+    field = widgets.IntegerField
 
 class SingleChoiceAttribute(BaseAttribute):
-    field = widgets.SingleChoice
+    field = widgets.SingleChoiceField
 
     
 # Global
 
 class Level(IntAttribute):
     default = 1
-
+    verbose_name = _('Niveau')
 
 from registries import attributes
 
@@ -68,8 +66,8 @@ from registries import attributes
 class Race(SingleChoiceAttribute):
     chosen = True
     default = None
-
     verbose_name = _('Race')
+
     def get_initial_data(self, **kwargs):
         from registries import races as races_registry
         return races_registry.values()

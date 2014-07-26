@@ -23,6 +23,7 @@ from utils import ugettext_lazy as _
 import chars
 import races
 from registries import attributes
+from forms import CharacterForm
 
 def get_asset(name):
     return os.path.join(ASSETS_DIR, name)
@@ -32,10 +33,7 @@ class GenerateCharacterWidget(QtGui.QWidget):
         super(GenerateCharacterWidget, self).__init__(*args, **kwargs)
         self.layout = QtGui.QVBoxLayout()       
 
-        self.form_layout = QtGui.QFormLayout()
-           
-        self.form_layout.addRow( *attributes.get('race').form_row())
-        self.layout.addLayout(self.form_layout)
+        self.layout.addLayout(CharacterForm().display())
         self.setLayout(self.layout) 
 
 class DonJon(QtGui.QMainWindow):
