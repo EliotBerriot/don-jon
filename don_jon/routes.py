@@ -1,6 +1,6 @@
-from views import TestOne
+import views
 from registries import routes
 from routing import Route
 
-routes.register(Route(TestOne, name='test.one'))
-
+routes.register(Route(views.TestOne, name='test.one', accepted_kwargs=['data', 'something']))
+routes.register(Route(views.CharacterCreate, name='character.create'))

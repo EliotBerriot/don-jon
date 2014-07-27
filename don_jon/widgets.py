@@ -1,40 +1,37 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
 from PySide import QtGui
-
-class BaseField(object):
-    label = ""
-    def __init__(self, *args, **kwargs):
-        self.label = kwargs.get('label', '')
-        self.initial = kwargs.get('initial')
-        super(BaseField, self).__init__()
-        self.default = kwargs.get('default')
-        if self.default is not None:
-            self.value = self.default
-
-    def display(self, **kwargs):
-        return self.label + " : ", self
+from utils import get_asset, reverse
 
 
-class IntegerField(BaseField, QtGui.QSpinBox):
-    @property
-    def value(self):
-        return super(IntegerField, self).value()
+class Action(QtGui.QAction):
 
-    @value.setter
-    def value(self, new_value):
-        return self.setValue(new_value)
+    def __init__(self, icon=None, label="", parent=None, toolbar=None, shortcut=None, callback=None, **kwargs):
+        icon = QtGui.QIcon(get_asset(icon))
+        self.parent = parent
+        super(Action, self).__init__(icon, label, parent)
 
+        if toolbar is not None:
+            toolbar.addAction(self)
 
-class SingleChoiceField(BaseField, QtGui.QComboBox):
+        if callback is not None:
+            self.triggered.connect(callback)
+        else:
+            self.triggered.connect(self.on_trigger)
 
-    def __init__(self, *args, **kwargs):
-        super(SingleChoiceField, self).__init__(*args, **kwargs)
-        l = [i.verbose_name for i in self.initial]
-        self.addItems(l)
+        if shortcut is not None:
+            self.setShortcut(shortcut)
 
-    @property
-    def value(self):
-        return self.initial[self.currentIndex()]
+    def on_trigger(self):
+        raise NotImplementedError
 
-    @value.setter
-    def value(self, new_value):
-        self.setCurrentIndex(self.initial.index(new_value))
+class ChangeViewAction(Action):
+    def __init__(self, **kwargs):
+        self.route = kwargs.get('route')
+        super(ChangeViewAction, self).__init__(**kwargs)
+
+    def on_trigger(self):
+        self.parent.central_widget = reverse(self.route)
+   
+

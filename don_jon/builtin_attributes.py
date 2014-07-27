@@ -1,5 +1,5 @@
 from utils import NameObject
-import widgets
+import fields
 from utils import ugettext_lazy as _
 
 class BaseAttribute(NameObject):
@@ -48,10 +48,10 @@ class BaseAttribute(NameObject):
         return self.field(initial=self.get_initial_data(), label=self.verbose_name)
 
 class IntAttribute(BaseAttribute):
-    field = widgets.IntegerField
+    field = fields.IntegerField
 
 class SingleChoiceAttribute(BaseAttribute):
-    field = widgets.SingleChoiceField
+    field = fields.SingleChoiceField
 
     
 # Global

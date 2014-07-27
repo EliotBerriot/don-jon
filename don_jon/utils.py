@@ -1,7 +1,14 @@
 import random
 from collections import OrderedDict
+import os
 
 ugettext_lazy = lambda s: s
+
+BASE_DIR = os.path.dirname(os.path.realpath(__file__))
+ASSETS_DIR = os.path.join(BASE_DIR, "assets")
+def get_asset(name):
+    return os.path.join(ASSETS_DIR, name)
+
 
 class AttrDict(dict):
     def __init__(self, *args, **kwargs):
@@ -67,7 +74,7 @@ def reverse(name, **kwargs):
     r = routes.get(name, None)
     if r is None:
         raise NoReverseMatch("No route found for name '{0}'".format(name))
-    return r.view(**kwargs)
+    return r.view(**kwargs).process()
 
 
 

@@ -17,54 +17,48 @@ from PySide import QtGui
 
 BASE_DIR = os.path.dirname(os.path.realpath(__file__))
 sys.path.append(os.path.dirname(BASE_DIR))
-ASSETS_DIR = os.path.join(BASE_DIR, "assets")
 
-from utils import ugettext_lazy as _
-import chars
-import races
-from registries import attributes
-from forms import CharacterForm
-
+from utils import reverse, get_asset, ugettext_lazy as _
+from widgets import ChangeViewAction
 from registries import routes
+import routes
 import sys
 
-routes.autodiscover(apps=('don_jon',))
 
-def get_asset(name):
-    return os.path.join(ASSETS_DIR, name)
-
-class GenerateCharacter(QtGui.QWidget):
-    def __init__(self, *args, **kwargs):
-        super(GenerateCharacterWidget, self).__init__(*args, **kwargs)
-        self.layout = QtGui.QVBoxLayout()       
-
-        self.layout.addLayout(CharacterForm().display())
-        self.setLayout(self.layout) 
 
 class DonJon(QtGui.QMainWindow):
     
-    default_widget = GenerateCharacter
+    default_view = 'character.create'
     def __init__(self):
         super(DonJon, self).__init__()
         
         self.initUI()
-        
+     
+    @property
+    def central_widget(self):
+        return self.central_widget
+
+    @central_widget.setter
+    def central_widget(self, new_value):
+        self.setCentralWidget(new_value)
+
     def initUI(self):
         self.setMinimumWidth(400)
         self.setMinimumHeight(400)
         self.setWindowTitle('Don Jon')
         self.setWindowIcon(QtGui.QIcon(get_asset("icon.png")))      
 
-        generateCharAction = QtGui.QAction(
-            QtGui.QIcon(get_asset("character-generate.png")), 
-            _(u"Créer un personnage"), 
-            self
-        )
-        generateCharAction.setShortcut('Ctrl+A')
-        generateCharAction.triggered.connect(self.generateCharacter)
         self.toolbar = self.addToolBar(_(u'Personnages'))
-        self.toolbar.addAction(generateCharAction)
-        self.setCentralWidget(self.default_widget())
+        g = ChangeViewAction(
+            icon="character-generate.png", 
+            label=_(u"Créer un personnage"), 
+            parent=self,
+            toolbar=self.toolbar,
+            shortcut='Ctrl+A',
+            route='character.create'
+        )
+        
+        self.central_widget = reverse(self.default_view)
         self.show()
 
     def generateCharacter(self):

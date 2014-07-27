@@ -29,15 +29,14 @@ class Route(object):
         else:
             for key in kwargs:
                 try:
-                    self.accepted_kwargs.accepted_kwargs
+                    self.accepted_kwargs.index(key)
 
                 except ValueError:
                     raise NoReverseMatch(
-                    "View for route '{0}' does not take any argument '{2}'".format(
+                    "View for route '{0}' does not take any argument '{1}'".format(
                         self.name, key
                         )                     
                     )
             return self._view(**kwargs)
 
 
-    

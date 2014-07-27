@@ -56,12 +56,10 @@ class CharacterTestCase(unittest.TestCase):
         self.assertEqual(b.attributes('dexterity').value, 21)
         self.assertEqual(b.attributes('constitution').value, 13)
 
-
     def test_character_generator(self):
         g = CharacterGenerator(race=Elf)
         c1 = g.create()
         self.assertEqual(c1.attributes('race').value, Elf)
-
 
     def test_can_override_character_generator_defaults(self):
         g = CharacterGenerator(race=Elf)
@@ -70,8 +68,11 @@ class CharacterTestCase(unittest.TestCase):
 
     def test_can_use_route(self):
         r = reverse('test.one', data="test", something="hello")
-        self.assertEqual(r.kwargs.get('data'), "test")
-        self.assertEqual(r.kwargs.get('something'), "hello")
+        self.assertEqual(r, {"data":"test", "something":"hello"})
+
+        from don_jon.routing import NoReverseMatch
+        with self.assertRaises(NoReverseMatch):
+            r = reverse('test.one', data="test", something="hello", error="yeah")
 
 class FormsTestCase(unittest.TestCase):
 
