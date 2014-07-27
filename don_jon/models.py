@@ -1,4 +1,4 @@
-from attributes import DefaultAttributesManager, default_attributes
+from attributes import AttributesManager, default_attributes
 from utils import NameObject
 from settings import Base
 from meta import classmaker
@@ -30,10 +30,9 @@ class CharacterMeta(DeclarativeMeta):
         for section, columns in default_attributes.items():
             for column in columns:
                 name = column.clsname()
-                setattr(cls, "_"+name, column())
-                s = hybrid_property(attribute_getter(name), attribute_setter(name))
-                setattr(cls, name, s)
-
+                setattr(cls, name, column())
+                #s = hybrid_property(attribute_getter(name), attribute_setter(name))
+                #setattr(cls, name, s)
         return cls
 
 
@@ -46,8 +45,9 @@ class Character(NameObject, Base):
     
 
     def __init__(self, *args, **kwargs):        
-        self.attributes = DefaultAttributesManager(character=self, **kwargs)
-        super(Character, self).__init__()
+        NameObject.__init__(self)
+        Base.__init__(self, *args, **kwargs)
+        self.attributes = AttributesManager(character=self, **kwargs)
 
     def display(self):
 

@@ -31,7 +31,49 @@ default_attributes['abilities'] = (
     
 )
 
+class AttributesManager(object):
 
+    attributes_cls = default_attributes
+    attributes = {}
+    def __init__(self, character, **kwargs):
+        self.character = character
+
+        self.setup_attributes()
+        self.setup_modifiers()
+
+    def setup_attributes(self):
+        for section, attributes in self.attributes_cls.items():
+            for attribute in attributes:
+                if hasattr(self, attribute.clsname()):
+                    # an attribute with the same name alredy exists !
+                    raise ValueError('Attribute {0} already set'.format(attribute.clsname()))
+                attr = attribute(base_value=getattr(self.character, attribute.clsname()), manager=self)
+                self.attributes[attribute.clsname()] = attr
+                setattr(self, attribute.clsname(), attr)
+
+    def setup_modifiers(self):
+        for name, attribute in self.attributes.items():
+            if attribute.chosen:
+                # race, gifts, etc.
+                try:
+                    modifiers = attribute.base_value.modify.items()
+                except AttributeError:
+                    # no value has been set
+                    pass
+            else:
+                # commons attributes (strength, armor, etc.)
+                modifiers = attribute.modify.items()
+            print("loop", name, modifiers)
+            for modified_attribute, modifier_function in modifiers:
+                if hasattr(modifier_function, '__call__'):
+                    # a lambda or a callback was passed to modify
+                    f = modifier_function
+                else:
+                    # a string was passed, try to look for a method with the same name on the attribute
+                    f = getattr(attribute, modifier_function)
+                getattr(self, modified_attribute).modifiers[modifier_function] = f
+
+        print("modifiers", self.strength.modifiers)
 class DefaultAttributesManager(dict):
 
     _attributes_list = default_attributes
