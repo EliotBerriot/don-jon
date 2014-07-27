@@ -1,22 +1,25 @@
 from utils import NameObject
 import fields
 from utils import ugettext_lazy as _
+from sqlalchemy import Column, Integer, String
 
-class BaseAttribute(NameObject):
+class BaseAttribute(NameObject, Column):
     
     modify = {}
-    default = None
+    default_value = None
     chosen = False
     field = None
     initial = None
+    data_type = Integer
     def __init__(self, character=None, value=None, **kwargs):
+        super(NameObject, self).__init__()
+        super(Column, self).__init__(self.clsname(), self.data_type)
         self.modifiers = {}
         self.character = character
         if value is not None:
             self._value = value
         else:
-            self._value = self.default
-
+            self._value = self.default_value
 
     @property
     def value(self):
@@ -48,6 +51,7 @@ class BaseAttribute(NameObject):
         return self.field(initial=self.get_initial_data(), label=self.verbose_name)
 
 class IntAttribute(BaseAttribute):
+    data_type = Integer
     field = fields.IntegerField
 
 class SingleChoiceAttribute(BaseAttribute):
@@ -57,7 +61,7 @@ class SingleChoiceAttribute(BaseAttribute):
 # Global
 
 class Level(IntAttribute):
-    default = 1
+    default_value = 1
     verbose_name = _('Niveau')
 
 from registries import attributes
@@ -75,7 +79,7 @@ class Race(SingleChoiceAttribute):
 # Abilities 
 
 class Ability(IntAttribute):
-    default = 10
+    default_value = 10
 
     @property
     def mod(self):
@@ -109,4 +113,4 @@ class Charisma(Ability):
 # defense
 
 class Armor_Class(BaseAttribute):
-    default = 10
+    default_value = 10

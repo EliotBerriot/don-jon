@@ -1,4 +1,4 @@
-from chars import Character
+from models import Character
 from PySide import QtGui
 
 

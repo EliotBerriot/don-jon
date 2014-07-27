@@ -8,7 +8,7 @@ if __name__ == "__main__":
         sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__file__)))))
         
 
-from don_jon.chars import BaseCharacter, Character, CharacterGenerator
+from don_jon.models import Character, CharacterGenerator
 from don_jon.races import Elf, Human
 from don_jon.attributes import DefaultAttributesManager
 from don_jon.registries import attributes, races, routes
@@ -22,7 +22,7 @@ class CharacterTestCase(unittest.TestCase):
 
     def test_can_get_attribute_modifier(self):
 
-        b = BaseCharacter(strength=14)
+        b = Character(strength=14)
         self.assertEqual(b.attributes('strength').mod, 2)
 
         b.attributes('intelligence').value = 20
@@ -34,8 +34,14 @@ class CharacterTestCase(unittest.TestCase):
         b.attributes('intelligence').value = 1
         self.assertEqual(b.attributes('intelligence').mod, -5)
 
+    def test_attribute_value_are_also_accessible_directly_from_instance(self):
+        b = Character(strength=14, charisma=32)
+        self.assertEqual(b.attributes('strength').value, 14)
+        self.assertEqual(b.strength, 14)
+        self.assertEqual(b.charisma, 32)
+
     def test_can_autoassign_instance_attributes(self):
-        b = BaseCharacter(level=12)
+        b = Character(level=12)
         self.assertEqual(b.attributes("level").value, 12)
 
 
