@@ -57,6 +57,20 @@ class D:
     def __int__(self):
         return self.value
 
+from registries import routes
+from routing import NoReverseMatch
+
+def reverse(name, **kwargs):
+    """
+    Try to find a view registered under the given name, and pass it kwargs
+    """
+    r = routes.get(name, None)
+    if r is None:
+        raise NoReverseMatch("No route found for name '{0}'".format(name))
+    return r.view(**kwargs)
+
+
+
 from functools import wraps
 from inspect import getargspec, isfunction
 from itertools import izip, ifilter, starmap

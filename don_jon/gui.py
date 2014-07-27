@@ -25,10 +25,15 @@ import races
 from registries import attributes
 from forms import CharacterForm
 
+from registries import routes
+import sys
+
+routes.autodiscover(apps=('don_jon',))
+
 def get_asset(name):
     return os.path.join(ASSETS_DIR, name)
 
-class GenerateCharacterWidget(QtGui.QWidget):
+class GenerateCharacter(QtGui.QWidget):
     def __init__(self, *args, **kwargs):
         super(GenerateCharacterWidget, self).__init__(*args, **kwargs)
         self.layout = QtGui.QVBoxLayout()       
@@ -38,7 +43,7 @@ class GenerateCharacterWidget(QtGui.QWidget):
 
 class DonJon(QtGui.QMainWindow):
     
-    default_widget = GenerateCharacterWidget
+    default_widget = GenerateCharacter
     def __init__(self):
         super(DonJon, self).__init__()
         
@@ -63,7 +68,7 @@ class DonJon(QtGui.QMainWindow):
         self.show()
 
     def generateCharacter(self):
-        self.setCentralWidget(GenerateCharacterWidget())
+        self.setCentralWidget(GenerateCharacter())
         
 def main():
     

@@ -26,3 +26,19 @@ class Races(Registry):
 
 races = Races()
 
+
+from routing import Route
+
+class Routes(Registry):
+
+    look_into = "routes"
+
+    def prepare_name(self, data, name=None):
+        return data.name
+
+    def validate(self, data):
+        if isinstance(data, Route):
+            return True
+        return False
+
+routes = Routes()
