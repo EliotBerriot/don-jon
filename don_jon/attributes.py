@@ -6,7 +6,6 @@ import sys
 
 attributes.autodiscover(apps=('don_jon',))
 races.autodiscover(apps=('don_jon',))
-
 class Empty:
     pass
 
@@ -40,6 +39,7 @@ class AttributesManager(object):
         self.character = character
         self.setup_attributes()
         self.setup_modifiers()
+        self.sync_character_attributes()
 
     def setup_attributes(self):
         for section, attributes in self.attributes_cls.items():
@@ -56,7 +56,7 @@ class AttributesManager(object):
             if attribute.chosen:
                 # race, gifts, etc.
                 try:
-                    modifiers = attribute.base_value.modify.items()
+                    modifiers = attribute.raw_value.modify.items()
                 except AttributeError:
                     # no value has been set
                     pass
@@ -72,6 +72,11 @@ class AttributesManager(object):
                     f = getattr(attribute, modifier_function)
                 self.get(modified_attribute).modifiers.register(data=f, name=attribute.clsname())
 
+    def sync_character_attributes(self):
+        for name, attribute in self._attributes.items():
+            char_attr = getattr(self.character, name, None)
+            if char_attr is not None:
+                setattr(self.character, name, attribute.value)
 
     def get(self, attribute, not_found=None):
         return self._attributes.get(attribute, not_found)

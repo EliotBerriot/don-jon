@@ -51,7 +51,41 @@ class CharacterTestCase(unittest.TestCase):
         self.session.add(b)
 
         q = self.session.query(Character).filter(Character.charisma==666).first()
-        self.assertEqual(q is b, True)
+        self.assertEqual(q, b)
+
+    def test_can_query_using_classic_operators(self):
+
+        a = Character(intelligence=14, level=6)
+        b = Character(intelligence=16, level=9)
+        c = Character(intelligence=18, level=12)
+        d = Character(intelligence=20, level=15)
+        self.session.add_all((a, b, c, d))
+        self.session.commit()
+
+        q = self.session.query(Character).filter(Character.level>=9).count()
+        self.assertEqual(q, 3)
+
+        q = self.session.query(Character).filter(Character.level>=9, Character.intelligence==20).count()
+        self.assertEqual(q, 1)
+
+        q = self.session.query(Character).filter(Character.level<=9, Character.intelligence==16).count()
+        self.assertEqual(q, 1)
+
+    def test_can_save_character_race_via_foreign_key(self):
+        a = Character(race="elf")
+        self.session.add(a)
+        self.session.commit()
+        q = self.session.query(Character).filter(Character.race=='elf')
+        self.assertEqual(q[0], a)
+
+    def test_character_modified_attributes_values_are_persisted_in_database(self):
+        a = Character(dexterity=15, constitution=12, race="elf")
+        self.assertEqual(a.attributes.dexterity.value, 17)
+        self.assertEqual(a.attributes.constitution.value, 10)
+        self.session.add(a)
+        self.session.commit()
+        q = self.session.query(Character).filter(Character.dexterity==17)
+        self.assertEqual(q[0], a)
 
     def test_attribute_value_are_also_accessible_directly_from_instance(self):
         b = Character(strength=14, charisma=32)
@@ -71,17 +105,17 @@ class CharacterTestCase(unittest.TestCase):
         self.assertEqual(b.attributes.armor_class.value, 10 + b.attributes.dexterity.mod)
 
     def test_race_add_modifiers(self):
-        b = Character(race=Elf, dexterity=19, constitution=15)
+        b = Character(race="elf", dexterity=19, constitution=15)
         self.assertEqual(b.attributes.dexterity.value, 21)
         self.assertEqual(b.attributes.constitution.value, 13)
 
     def test_character_generator(self):
-        g = CharacterGenerator(race=Elf)
+        g = CharacterGenerator(race="elf")
         c1 = g.create()
-        self.assertEqual(c1.attributes.race.base_value, Elf)
+        self.assertEqual(c1.attributes.race.raw_value, Elf)
 
     def test_can_override_character_generator_defaults(self):
-        g = CharacterGenerator(race=Elf)
+        g = CharacterGenerator(race="elf")
         c1 = g.create(level=12)
         self.assertEqual(c1.attributes.level.base_value, 12)
 
@@ -94,8 +128,7 @@ class CharacterTestCase(unittest.TestCase):
             r = reverse('test.one', data="test", something="hello", error="yeah")
 
     def test_modifiers_are_properly_registered_for_each_character(self):
-        b = Character(race=Elf, dexterity=19, constitution=15)
-        print(b.attributes.get('dexterity').modifiers)
+        b = Character(race="elf", dexterity=19, constitution=15)
         self.assertEqual(b.attributes.get('dexterity').modifiers.get('race'), Elf.modify.get('dexterity'))
 
 class FormsTestCase(unittest.TestCase):
@@ -123,7 +156,7 @@ class FormsTestCase(unittest.TestCase):
         form.fields['race'].value = Human
         form.fields['level'].value = 26
         character = form.process()
-        self.assertEqual(character.attributes.race.base_value, Human)
+        self.assertEqual(character.attributes.race.raw_value, Human)
         self.assertEqual(character.attributes.level.base_value, 26)
 
 if __name__ == "__main__":

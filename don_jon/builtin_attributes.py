@@ -1,8 +1,10 @@
 from utils import NameObject
 import fields
 from utils import ugettext_lazy as _
-from sqlalchemy import Column, Integer, String
-from registries import Modifiers
+from sqlalchemy import Column, Integer, String, ForeignKey
+from sqlalchemy.orm import relationship, backref
+from registries import Modifiers, races as races_registry
+
 class BaseAttribute(NameObject, Column):
     
     modify = {}
@@ -12,7 +14,7 @@ class BaseAttribute(NameObject, Column):
     initial = None
     data_type = Integer
 
-    def __init__(self, **kwargs):
+    def __init__(self, *args, **kwargs):
         self.modifiers = Modifiers()
         super(NameObject, self).__init__()
         super(Column, self).__init__(self.clsname(), self.data_type)
@@ -21,6 +23,12 @@ class BaseAttribute(NameObject, Column):
             self.base_value = kwargs.get('base_value')
         else:
             self.base_value = self.default_value
+
+    def _constructor(self, name, type_, **kwargs):
+        """Needed by SQLAlchemy"""
+        col = BaseAttribute(name, type_, **kwargs)
+        return col
+
 
 
     @property
@@ -53,8 +61,35 @@ class IntAttribute(BaseAttribute):
 
 class SingleChoiceAttribute(BaseAttribute):
     field = fields.SingleChoiceField
+    choices = [] # should be an iterable of label/value tuples
 
-    
+
+    def __init__(self, *args, **kwargs):
+        self.choices = self.get_choices()
+        super(SingleChoiceAttribute, self).__init__(*args, **kwargs)
+
+    def get_choices(self):
+        return self.choices
+
+    @property
+    def base_value(self):
+        """returns a string"""
+        return self._choice[0]
+
+    @property
+    def raw_value(self):
+        """returns the the raw class"""
+        return self._choice[1]
+
+    @base_value.setter
+    def base_value(self, new_value):
+        try:
+            c = [c for c in self.choices if c[0] == new_value or c[1] == new_value][0]
+        except IndexError:
+            c = None
+        self._choice = c
+
+
 # Global
 
 class Level(IntAttribute):
@@ -66,11 +101,20 @@ from registries import attributes
 @attributes.register
 class Race(SingleChoiceAttribute):
     chosen = True
-    default = None
     verbose_name = _('Race')
+    data_type = String
+
+
+    @property
+    def default_value(self):
+        return races_registry.get('human')
+
+    def get_choices(self):
+        r = races_registry.items()
+        return r
 
     def get_initial_data(self, **kwargs):
-        from registries import races as races_registry
+        
         return races_registry.values()
         
 # Abilities 
