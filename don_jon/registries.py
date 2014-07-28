@@ -1,5 +1,15 @@
 from persisting_theory import Registry
 
+class ManagedAttributes(Registry):
+
+    look_into = None    
+
+    
+
+class Modifiers(Registry):
+
+    look_into = None
+
 
 class Attributes(Registry):
 
@@ -9,7 +19,7 @@ class Attributes(Registry):
         return data()
 
     def prepare_name(self, data, name=None):
-        return data.clsname()
+        return data.clsname()    
 
 attributes = Attributes()
 

@@ -2,17 +2,18 @@ from utils import NameObject
 import fields
 from utils import ugettext_lazy as _
 from sqlalchemy import Column, Integer, String
-
+from registries import Modifiers
 class BaseAttribute(NameObject, Column):
     
     modify = {}
-    modifiers = {}
     default_value = None
     chosen = False
     field = None
     initial = None
     data_type = Integer
+
     def __init__(self, **kwargs):
+        self.modifiers = Modifiers()
         super(NameObject, self).__init__()
         super(Column, self).__init__(self.clsname(), self.data_type)
         self.manager = kwargs.get('manager')
@@ -20,6 +21,8 @@ class BaseAttribute(NameObject, Column):
             self.base_value = kwargs.get('base_value')
         else:
             self.base_value = self.default_value
+
+
     @property
     def value(self):
         """

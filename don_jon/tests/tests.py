@@ -10,7 +10,6 @@ if __name__ == "__main__":
 
 from don_jon.models import Character, CharacterGenerator
 from don_jon.races import Elf, Human
-from don_jon.attributes import DefaultAttributesManager
 from don_jon.registries import attributes, races, routes
 from don_jon.forms import CharacterForm
 from don_jon.utils import reverse
@@ -72,11 +71,9 @@ class CharacterTestCase(unittest.TestCase):
         self.assertEqual(b.attributes.armor_class.value, 10 + b.attributes.dexterity.mod)
 
     def test_race_add_modifiers(self):
-        print('TESTING RACE')
         b = Character(race=Elf, dexterity=19, constitution=15)
         self.assertEqual(b.attributes.dexterity.value, 21)
         self.assertEqual(b.attributes.constitution.value, 13)
-        print('END TESTING RACE')
 
     def test_character_generator(self):
         g = CharacterGenerator(race=Elf)
@@ -96,6 +93,11 @@ class CharacterTestCase(unittest.TestCase):
         with self.assertRaises(NoReverseMatch):
             r = reverse('test.one', data="test", something="hello", error="yeah")
 
+    def test_modifiers_are_properly_registered_for_each_character(self):
+        b = Character(race=Elf, dexterity=19, constitution=15)
+        print(b.attributes.get('dexterity').modifiers)
+        self.assertEqual(b.attributes.get('dexterity').modifiers.get('race'), Elf.modify.get('dexterity'))
+
 class FormsTestCase(unittest.TestCase):
 
     def test_can_build_field_from_attribute(self):
@@ -106,7 +108,7 @@ class FormsTestCase(unittest.TestCase):
         field = attributes.get('race').form_field()
 
         self.assertEqual(field.currentText(), 'Elfe')
-        self.assertEqual(field.base_value, Elf)
+        self.assertEqual(field.value, Elf)
 
     def test_can_update_single_choice_field(self):
 
@@ -118,8 +120,8 @@ class FormsTestCase(unittest.TestCase):
     def test_can_create_character_from_form(self):
 
         form = CharacterForm()
-        form.fields['race'].base_value = Human
-        form.fields['level'].base_value = 26
+        form.fields['race'].value = Human
+        form.fields['level'].value = 26
         character = form.process()
         self.assertEqual(character.attributes.race.base_value, Human)
         self.assertEqual(character.attributes.level.base_value, 26)

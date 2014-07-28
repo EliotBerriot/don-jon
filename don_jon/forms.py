@@ -14,7 +14,7 @@ class CharacterForm(object):
 
         self.fields = {}
         for field in self.enabled_fields:
-            self.fields[field] = self.instance.attributes(field).form_field()
+            self.fields[field] = self.instance.attributes.get(field).form_field()
 
 
     def validate(self):
@@ -23,7 +23,7 @@ class CharacterForm(object):
     def process(self):
         if self.validate():
             for field in self.enabled_fields:
-                self.instance.attributes(field).value = self.fields[field].value
+                self.instance.attributes.get(field).base_value = self.fields[field].value
 
             return self.instance
         else:
