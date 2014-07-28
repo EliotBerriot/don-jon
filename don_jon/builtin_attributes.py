@@ -1,3 +1,6 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
 from utils import NameObject
 import fields
 from utils import ugettext_lazy as _
@@ -13,6 +16,7 @@ class BaseAttribute(NameObject, Column):
     field = None
     initial = None
     data_type = Integer
+    _base_value = None
 
     def __init__(self, *args, **kwargs):
         self.modifiers = Modifiers()
@@ -29,6 +33,16 @@ class BaseAttribute(NameObject, Column):
         col = BaseAttribute(name, type_, **kwargs)
         return col
 
+    @property
+    def base_value(self):
+        return self._base_value
+
+    @base_value.setter
+    def base_value(self, new_value):
+        self._base_value = new_value
+        if self.manager is not None:
+            # update model value
+            setattr(self.manager.character, self.clsname(), self.value)
 
 
     @property
@@ -45,7 +59,9 @@ class BaseAttribute(NameObject, Column):
         return str(self.value)
         
 
-    
+    def get_default_value(self):
+        return self.default_value
+
     def get_initial_data(self, **kwargs):
         """
         Return initial data for form field
@@ -53,7 +69,10 @@ class BaseAttribute(NameObject, Column):
         return self.initial
     
     def form_field(self, **kwargs):
-        return self.field(initial=self.get_initial_data(), label=self.verbose_name)
+        return self.field(
+            initial=self.get_initial_data(), 
+            default=self.get_default_value(),
+            label=self.verbose_name)
 
 class IntAttribute(BaseAttribute):
     data_type = Integer
@@ -88,6 +107,8 @@ class SingleChoiceAttribute(BaseAttribute):
         except IndexError:
             c = None
         self._choice = c
+        if self.manager is not None:
+            setattr(self.manager.character, self.clsname(), self.value)
 
 
 # Global
@@ -127,10 +148,13 @@ class Ability(IntAttribute):
         return (self.base_value / 2) - 5
 
 class Strength(Ability):
-    pass
+    
+    verbose_name = _('Force')
+
 
 class Dexterity(Ability):
     
+    verbose_name = _(u'Dextérité')
     modify = {
         'armor_class': "dex_bonus",
     }
@@ -140,18 +164,24 @@ class Dexterity(Ability):
         return original_value + self.mod
 
 class Constitution(Ability):
-    pass
+    
+    verbose_name = _('Constitution')
 
 class Wisdom(Ability):
-    pass
+    
+    verbose_name = _('Sagesse')
 
 class Intelligence(Ability):
-    pass
+    
+    verbose_name = _('intelligence')
 
 class Charisma(Ability):
-    pass
+    
+    verbose_name = _('Charisme')
 
 # defense
 
 class Armor_Class(BaseAttribute):
+
+    verbose_name = _("Classe d'armure")
     default_value = 10

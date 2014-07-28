@@ -58,7 +58,7 @@ class DonJon(QtGui.QMainWindow):
             route='character.create'
         )
         
-        self.central_widget = reverse(self.default_view)
+        self.central_widget = reverse(self.default_view, parent=self)
         self.show()
 
     def generateCharacter(self):

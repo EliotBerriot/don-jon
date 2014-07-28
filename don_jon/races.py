@@ -5,7 +5,7 @@ from utils import ugettext_lazy as _
 
 
 class BaseRace(NameObject):
-    pass
+    modify = {}
 
 @races_registry.register
 class Elf(BaseRace):

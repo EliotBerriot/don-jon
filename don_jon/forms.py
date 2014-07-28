@@ -1,12 +1,17 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
 from models import Character
 from PySide import QtGui
+from utils import ugettext_lazy as _
 
 
 class CharacterForm(object):
-    enabled_fields = ('race', 'level')
+    enabled_fields = ('race', 'level', 'strength', 'dexterity', 'constitution')
 
     model = Character
-    def __init__(self, instance=None, **kwargs):
+    def __init__(self, parent, instance=None, **kwargs):
+        self.parent = parent
         if instance is not None:
             self.instance = instance
         else:
@@ -29,9 +34,21 @@ class CharacterForm(object):
         else:
             raise ValidationError 
 
+
+    def save(self):
+        char = self.process()
+        char.attributes.sync()
+
+        char.display()
+
     def display(self):
         form_layout = QtGui.QFormLayout()
            
         for field in self.enabled_fields:
             form_layout.addRow(*self.fields[field].display())
+
+        save = QtGui.QPushButton(_("Sauvegarder"), self.parent)
+        form_layout.addRow(save)
+        save.clicked.connect(lambda: self.save())
+
         return form_layout

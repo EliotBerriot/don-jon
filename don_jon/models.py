@@ -51,11 +51,11 @@ class Character(NameObject, Base):
 
     def display(self):
 
-        for section, attributes in self.attributes._attributes_list.items():
+        for section, attributes in self.attributes.attributes_cls.items():
             print('{0}\n{1}\n'.format(section, "*" * len(section)))
 
             for a in attributes:
-                attribute = self.attributes(a.clsname())
+                attribute = self.attributes.get(a.clsname())
                 key = attribute.clsname()
                 if isinstance(attribute.value, type):
                     value = attribute.value.clsname()

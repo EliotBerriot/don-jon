@@ -1,7 +1,11 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
 
 class View(object):
-    def __init__(self, **kwargs):
+    def __init__(self, parent, **kwargs):
         super(View, self).__init__()
+        self.parent = parent
         self.kwargs = kwargs
 
     def __call__(self, **kwargs):
@@ -23,7 +27,7 @@ class CharacterCreate(View, QtGui.QWidget):
         super(CharacterCreate, self).__init__(*args, **kwargs)
         self.layout = QtGui.QVBoxLayout()       
 
-        self.layout.addLayout(CharacterForm().display())
+        self.layout.addLayout(CharacterForm(parent=self.parent).display())
         self.setLayout(self.layout) 
 
     def process(self, **kwargs):

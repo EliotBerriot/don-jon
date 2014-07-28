@@ -38,8 +38,7 @@ class AttributesManager(object):
         self._attributes = ManagedAttributes()
         self.character = character
         self.setup_attributes()
-        self.setup_modifiers()
-        self.sync_character_attributes()
+        self.sync()
 
     def setup_attributes(self):
         for section, attributes in self.attributes_cls.items():
@@ -51,7 +50,13 @@ class AttributesManager(object):
                 self._attributes.register(data=attr, name=attribute.clsname())
                 setattr(self, attribute.clsname(), attr)
 
+    def reset_mofifiers(self):
+        for name, attribute in self._attributes.items():
+            self.get(name).modifiers.clear()
+
     def setup_modifiers(self):
+        self.reset_mofifiers()
+        
         for name, attribute in self._attributes.items():
             if attribute.chosen:
                 # race, gifts, etc.
@@ -63,6 +68,7 @@ class AttributesManager(object):
             else:
                 # commons attributes (strength, armor, etc.)
                 modifiers = attribute.modify.items()
+
             for modified_attribute, modifier_function in modifiers:
                 if hasattr(modifier_function, '__call__'):
                     # a lambda or a callback was passed to modify
@@ -70,9 +76,11 @@ class AttributesManager(object):
                 else:
                     # a string was passed, try to look for a method with the same name on the attribute
                     f = getattr(attribute, modifier_function)
+
                 self.get(modified_attribute).modifiers.register(data=f, name=attribute.clsname())
 
-    def sync_character_attributes(self):
+    def sync(self):
+        self.setup_modifiers()
         for name, attribute in self._attributes.items():
             char_attr = getattr(self.character, name, None)
             if char_attr is not None:
