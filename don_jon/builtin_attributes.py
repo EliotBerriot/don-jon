@@ -137,11 +137,8 @@ class Race(SingleChoiceAttribute):
     chosen = True
     verbose_name = _('Race')
     data_type = String
+    default_value = "human"
 
-
-    @property
-    def default_value(self):
-        return races_registry.get('human')
 
     def get_choices(self):
         r = races_registry.items()

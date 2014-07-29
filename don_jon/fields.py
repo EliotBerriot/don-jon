@@ -39,7 +39,7 @@ class IntegerField(BaseField, QtGui.QSpinBox):
 
     @BaseField.value.getter
     def value(self):
-        return super(IntegerField, self).value()   
+        return QtGui.QSpinBox.value(self)   
 
     def change_value(self, new_value):
         self.setValue(new_value)
@@ -50,15 +50,13 @@ class SingleChoiceField(BaseField, QtGui.QComboBox):
 
     def __init__(self, *args, **kwargs):
         super(SingleChoiceField, self).__init__(*args, **kwargs)
-        l = [i.verbose_name for i in self.initial]
-        self.addItems(l)
+        self.display_list = [i.verbose_name for i in self.initial]
+        self.addItems(self.display_list)
 
     @BaseField.value.getter
     def value(self):
         return self.initial[self.currentIndex()]
 
     def change_value(self, new_value):
-        print self.initial
-        name = new_value.clsname()
         choices = [c.clsname() for c in self.initial]
-        self.setCurrentIndex(choices.index(name))
+        self.setCurrentIndex(choices.index(new_value))
