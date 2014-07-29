@@ -20,7 +20,8 @@ class CharacterForm(object):
         for section in self.enabled_fields:
             for attribute_cls in self.instance.attributes.attributes_cls.get(section, []):
                 self.fields[attribute_cls.clsname()] = self.instance.attributes.get(attribute_cls.clsname()).form_field()
-
+                
+        self.total_value_fields = {}
 
     def validate(self):
         return True
@@ -35,14 +36,18 @@ class CharacterForm(object):
             raise ValidationError 
 
     def update(self):
-        print('value changed')
         self.instance = self.process()
         self.instance.attributes.sync()
         self.sync_field_values()
+        self.instance.display()
 
     def sync_field_values(self):
         for name, field in self.fields.items():
             field.value = self.instance.attributes.get(name).base_value
+
+        for name, field in self.total_value_fields.items():
+            field.setText(str(self.instance.attributes.get(name).value))
+
     def save(self):
         char = self.process()
         char.attributes.sync()
@@ -55,13 +60,46 @@ class CharacterForm(object):
         form_layout.addStretch(1)
 
         for section in self.enabled_fields:
-            s = QtGui.QGroupBox(section)
-            s_layout = QtGui.QFormLayout()
-            for attribute_cls in self.instance.attributes.attributes_cls.get(section, []):
-                label, field = self.fields[attribute_cls.clsname()].display()
-                field.value_changed.connect(self.update)
-                s_layout.addRow(label, field)
+            # Create field groups 
 
+            s = QtGui.QGroupBox(section)
+            s_layout = QtGui.QGridLayout()
+
+            row = 0
+
+            total_enabled = False
+            if section  in ("abilities", 'defense'):
+                total_enabled = True
+                # add abilities specific headers
+                s_layout.addWidget(QtGui.QLabel(_('Valeur de base')), 0, 1)
+                s_layout.addWidget(QtGui.QLabel(_('Valeur totale')), 0, 2)
+                row = 1
+
+            for attribute_cls in self.instance.attributes.attributes_cls.get(section, []):
+                # instanciate fields
+                # get label and fields
+                name = attribute_cls.clsname()
+                field = self.fields[name]
+                widgets = field.display()
+                column = 0
+
+                for widget in widgets:
+                    # Widget is just a string, so create a label
+                    if isinstance(widget, str) or isinstance(widget, unicode):
+                        widget = QtGui.QLabel(widget)
+
+                    s_layout.addWidget(widget, row, column)                    
+                    column += 1
+
+                    # Add signal to keep field value synced with character changes
+                    if hasattr(widget, 'keep_synced') and widget.keep_synced and hasattr(widget, 'value_changed'):
+                        widget.value_changed.connect(self.update)
+
+                    if total_enabled:
+                        total_value_widget = QtGui.QLabel(str(self.instance.attributes.get(name).value))
+                        self.total_value_fields[name] = total_value_widget
+                        s_layout.addWidget(total_value_widget, row, column)
+                row += 1
             s.setLayout(s_layout)
             form_layout.addWidget(s)
 

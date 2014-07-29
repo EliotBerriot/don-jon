@@ -6,6 +6,9 @@ class BaseField(object):
     value_changed = QtCore.Signal()
     base_value_changed_signal = None
 
+    # If true, form will add signal to update field value on character change
+    keep_synced = True
+
     def __init__(self, *args, **kwargs):
         self.label = kwargs.get('label', '')
         self.initial = kwargs.get('initial')
@@ -32,6 +35,9 @@ class BaseField(object):
         self.change_value(new_value)
         self.blockSignals(False)
 
+    def additional_widgets(self):
+        
+        return tuple()
 class IntegerField(BaseField, QtGui.QSpinBox):
 
     base_value_changed_signal = 'valueChanged'

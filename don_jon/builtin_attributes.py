@@ -157,6 +157,12 @@ class Ability(IntAttribute):
     def mod(self):
         return (self.base_value / 2) - 5
 
+    def form_field(self, **kwargs):
+        """Add modificator field to form"""
+        widgets = super(Ability, self).form_field(**kwargs)
+        print("Ability", widgets)
+        return widgets 
+
 class Strength(Ability):
     
     verbose_name = _('Force')
