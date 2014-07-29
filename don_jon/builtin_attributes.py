@@ -20,6 +20,7 @@ class BaseAttribute(NameObject, Column):
 
     def __init__(self, *args, **kwargs):
         self.modifiers = Modifiers()
+        self.section = kwargs.pop('section', None)
         super(NameObject, self).__init__()
         super(Column, self).__init__(self.clsname(), self.data_type)
         self.manager = kwargs.get('manager')
@@ -73,6 +74,18 @@ class BaseAttribute(NameObject, Column):
             initial=self.get_initial_data(), 
             default=self.get_default_value(),
             label=self.verbose_name)
+
+
+    @property
+    def modifiers_descriptions(self):
+        """return a list of tuples with modifiers, and the amount modified"""
+        b = self.base_value
+        descriptions = []
+        for modifier_name, modifier in self.modifiers.items():
+            mod_value = modifier(b) - b
+            descriptions.append((modifier_name, mod_value))
+
+        return descriptions
 
 class IntAttribute(BaseAttribute):
     data_type = Integer
@@ -181,7 +194,7 @@ class Charisma(Ability):
 
 # defense
 
-class Armor_Class(BaseAttribute):
+class Armor_Class(IntAttribute):
 
-    verbose_name = _("Classe d'armure")
+    verbose_name = _(u"Classe d'armure")
     default_value = 10

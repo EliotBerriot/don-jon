@@ -3,7 +3,7 @@
 
 
 class View(object):
-    def __init__(self, parent, **kwargs):
+    def __init__(self, parent=None, **kwargs):
         super(View, self).__init__()
         self.parent = parent
         self.kwargs = kwargs

@@ -131,6 +131,10 @@ class CharacterTestCase(unittest.TestCase):
         b = Character(race="elf", dexterity=19, constitution=15)
         self.assertEqual(b.attributes.get('dexterity').modifiers.get('race'), Elf.modify.get('dexterity'))
 
+    def test_can_get_modifier_value_per_attribute(self):
+        b = Character(race="elf", dexterity=19, constitution=15)
+        self.assertEqual(b.attributes.get('dexterity').modifiers_descriptions, [("race", 2)])
+        self.assertEqual(b.attributes.get('constitution').modifiers_descriptions, [("race", -2)])
 class FormsTestCase(unittest.TestCase):
 
     def test_can_build_field_from_attribute(self):

@@ -46,7 +46,7 @@ class AttributesManager(object):
                 if hasattr(self, attribute.clsname()):
                     # an attribute with the same name alredy exists !
                     raise ValueError('Attribute {0} already set'.format(attribute.clsname()))
-                attr = attribute(base_value=getattr(self.character, attribute.clsname()), manager=self)
+                attr = attribute(base_value=getattr(self.character, attribute.clsname()), manager=self, section=section)
                 self._attributes.register(data=attr, name=attribute.clsname())
                 setattr(self, attribute.clsname(), attr)
 
