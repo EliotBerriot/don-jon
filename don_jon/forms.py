@@ -34,7 +34,8 @@ class CharacterForm(object):
         else:
             raise ValidationError 
 
-
+    def changed(self):
+        print('valuec hanged')
     def save(self):
         char = self.process()
         char.attributes.sync()
@@ -49,7 +50,9 @@ class CharacterForm(object):
             s = QtGui.QGroupBox(section)
             s_layout = QtGui.QFormLayout()
             for attribute_cls in self.instance.attributes.attributes_cls.get(section, []):
-                s_layout.addRow(*self.fields[attribute_cls.clsname()].display())
+                label, field = self.fields[attribute_cls.clsname()].display()
+                field.value_changed.connect(self.changed)
+                s_layout.addRow(label, field)
 
             s.setLayout(s_layout)
             form_layout.addWidget(s)

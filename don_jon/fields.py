@@ -1,7 +1,10 @@
-from PySide import QtGui
+from PySide import QtGui, QtCore
 
 class BaseField(object):
     label = ""
+
+    value_changed = QtCore.Signal()
+
     def __init__(self, *args, **kwargs):
         self.label = kwargs.get('label', '')
         self.initial = kwargs.get('initial')
@@ -13,8 +16,11 @@ class BaseField(object):
     def display(self, **kwargs):
         return self.label + " : ", self
 
+    def emit_value_changed(self):
+        self.value_changed.emit()
 
 class IntegerField(BaseField, QtGui.QSpinBox):
+
     @property
     def value(self):
         return super(IntegerField, self).value()
@@ -22,6 +28,7 @@ class IntegerField(BaseField, QtGui.QSpinBox):
     @value.setter
     def value(self, new_value):
         return self.setValue(new_value)
+        self.emit_value_changed()
 
 
 class SingleChoiceField(BaseField, QtGui.QComboBox):
@@ -38,3 +45,4 @@ class SingleChoiceField(BaseField, QtGui.QComboBox):
     @value.setter
     def value(self, new_value):
         self.setCurrentIndex(self.initial.index(new_value))
+        self.emit_value_changed()
