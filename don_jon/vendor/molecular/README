@@ -1,0 +1,147 @@
+molecular.py
+Copyright (c) 2001, Chris Gonnerman
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without 
+modification, are permitted provided that the following conditions
+are met:
+
+Redistributions of source code must retain the above copyright
+notice, this list of conditions and the following disclaimer. 
+
+Redistributions in binary form must reproduce the above copyright
+notice, this list of conditions and the following disclaimer in the
+documentation and/or other materials provided with the distribution. 
+
+Neither the name of the author nor the names of any contributors
+may be used to endorse or promote products derived from this software
+without specific prior written permission. 
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+AUTHOR OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+------------------------------------------------------------------------------
+
+Included with this package are atom files generated from the name lists used
+with the "ngen" name generator.  Attributions are included in the .directory
+file in the atoms folder.  No "ngen" source code is included here, but just
+for the record:
+
+    ngen is Copyright (C) Kimmo Kulovesi 1998 <arkha@softhome.net>
+
+The license for ngen is basically the GPL.  I am unclear whether or not the
+namefiles are under the same license or not.  If Kimmo finds fault with this
+distribution I will, of course, remove the offending files.
+
+I have revised the namefiles in the following ways:  First, the descriptive
+text has been changed to use HTML entity codes instead of characters with
+values >= 0x80.  Second, I have removed the diacritical marks from the
+name files (basically only the Elven files) because they don't display
+correctly on web browsers.  Yes, there also I should have used entity
+codes, but frankly I'm too much of an American to know how those marks
+affect pronunciation anyway... ;-}
+
+------------------------------------------------------------------------------
+
+molecular.py -- molecular (ngenoid) name generator
+
+This module knows how to generate "random" names for RPG characters.
+It uses the same method as the "ngen" name generator by Kimmo Kulovesi,
+and in fact it can use the same name files.  molecular.py knows how
+to merge multiple tables also, which can be handy...
+
+If run as a command-line program, use the following options:
+
+    -r namefile    -- read the given name file and add to the
+                      current name table.
+    nnn            -- generate nnn (a number) names and print
+                      on standard output.
+
+To generate names from a name file:
+
+    python molecular.py -r file 10
+
+As a module (to be imported) you get the following classes and functions:
+
+    NameFile (class)    -- a file wrapper with a disabled close() method,
+                           used internally and probably not useful otherwise.
+    nameopen (function) -- opens a file; takes filename and mode options,
+                           searches the default name file directory if not
+                           found in current directory, handles "-" filenames,
+                           and uses NameFile to disable closing of sys.stdin/
+                           sys.stdout.
+    Molecule (class)    -- the meat of the matter.  A Molecule instance has
+                           the following methods:
+
+                                .load(file)    -- loads a name file, 
+                                                  which may be a file-like
+                                                  object with a .readline()
+                                                  method or a filename as a
+                                                  string.
+                                .name()        -- generate one name and
+                                                  return it.
+
+------------------------------------------------------------------------------
+
+Namefile Format
+
+The standard namefile consists of lists of name-parts, one per line.  Spacing
+is significant; spaces at the beginning or end of the line are retained. 
+ngen may not retain spaces at the end; I'm not sure.  Kimmo's namefiles all
+have mandatory spacing, if any, at the beginning of the line.
+
+These name-parts are broken up into groups, or sections, by lines of the form:
+
+    [section]
+
+and there are five standard section headers:  [inf], [first], [mid], [final],
+[end].  To these five standard sections, I add one more optional section,
+[notes], which is not used directly by molecular.py but which is used in my
+CGI script.
+
+Lines following the [inf] header are descriptive; the first should be a 
+capsule description of the namefile, and others are often additional 
+attributions.
+
+Lines following [first] are initial name parts; [mid] is middle parts, and
+[final] is endings.  Any of these sections may be omitted, and molecular.py
+will then skip that section when the name generator is called.
+
+Lines in the [end] section are ignored (as are lines before the first 
+section).
+
+My [notes] section contains instructions (if such are needed) to assist in
+using the namelist.  The obvious example is my Nevermore Elven surnames list,
+which contains '-' characters for pronunciation but which should be removed
+when the name is written normally.  The [notes] section explains this.
+Perhaps I should have put this in [inf] but the end result looks better 
+(IMHO) in my CGI script.
+
+molecular.py loads and stores sections of any name, but does not use any 
+sections internally except [first], [mid], and [final].
+
+------------------------------------------------------------------------------
+
+Installation
+
+You can install the molecular.py module using the setup.py provided; as root 
+(if needed on your OS) type:
+
+    python setup.py install
+
+This does not install the name files, though; read the beginning of 
+molecular.py to find the variable NAMEDIR, revise if needed, and put 
+the name files in the given directory.
+
+Also the mnames.cgi script will need to be installed in your webserver's 
+cgi-bin (this is left as an exercise for the reader :-)
+

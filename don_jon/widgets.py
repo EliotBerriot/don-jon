@@ -4,11 +4,15 @@
 from PySide import QtGui
 from utils import get_asset, reverse
 
+class Icon(QtGui.QIcon):
+    def __init__(self, file_name):
+        path = get_asset(file_name)
+        super(Icon, self).__init__(path)
 
 class Action(QtGui.QAction):
 
     def __init__(self, icon=None, label="", parent=None, toolbar=None, shortcut=None, callback=None, **kwargs):
-        icon = QtGui.QIcon(get_asset(icon))
+        icon = Icon(icon)
         self.parent = parent
         super(Action, self).__init__(icon, label, parent)
 
@@ -32,6 +36,6 @@ class ChangeViewAction(Action):
         super(ChangeViewAction, self).__init__(**kwargs)
 
     def on_trigger(self):
-        self.parent.central_widget = reverse(self.route)
+        self.parent.central_widget = reverse(self.route, parent=self.parent)
    
 

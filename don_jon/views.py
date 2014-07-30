@@ -26,28 +26,27 @@ from forms import CharacterForm
 class CharacterCreate(View, QtGui.QWidget):
     def __init__(self, *args, **kwargs):
         super(CharacterCreate, self).__init__(*args, **kwargs)
-        self.layout = QtGui.QVBoxLayout()       
-
-        self.layout.addLayout(CharacterForm(parent=self.parent).display())
+        self.layout = QtGui.QVBoxLayout() 
+        self.layout.addLayout(CharacterForm(session=session, parent=self.parent).display())
         self.setLayout(self.layout) 
 
     def process(self, **kwargs):
         return self
 
 class CharacterList(View, QtGui.QWidget):
-    fields = ('level', 'race')
+    fields = ('name', 'level', 'race', 'id', )
     def __init__(self, *args, **kwargs):
         super(CharacterList, self).__init__(*args, **kwargs)
         self.layout = QtGui.QVBoxLayout()
 
         queryset = self.get_queryset()
-        self.list = QtGui.QTableWidget(queryset.count()+1, 2, self.parent)
+        self.list = QtGui.QTableWidget(queryset.count()+1, len(self.fields), self.parent)
         self.list.setHorizontalHeaderLabels([_(f) for f in self.fields])
         row = 0
         for character in queryset:
             column = 0
             for field in self.fields:
-                i = QtGui.QTableWidgetItem(str(character.attributes.get(field).value))
+                i = QtGui.QTableWidgetItem(str(getattr(character, field)))
                 self.list.setItem(row, column, i)
                 column += 1
             row += 1
@@ -60,7 +59,6 @@ class CharacterList(View, QtGui.QWidget):
     def get_queryset(self):
         try:
             c = session.query(Character).count()
-            print("count", c)
         except:
             Base.metadata.create_all(database) 
         queryset = session.query(Character)

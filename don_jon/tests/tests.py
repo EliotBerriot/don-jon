@@ -15,7 +15,6 @@ from don_jon.forms import CharacterForm
 from don_jon.utils import reverse
 from don_jon import gui
 from don_jon.settings import test_database, Base
-
 from sqlalchemy.orm import sessionmaker
 from PySide import QtGui
 
@@ -145,6 +144,10 @@ class CharacterTestCase(unittest.TestCase):
 
 class FormsTestCase(unittest.TestCase):
 
+    def setUp(self):
+        Base.metadata.create_all(test_database) 
+        self.session = sessionmaker(bind=test_database)()
+        
     def test_can_build_field_from_attribute(self):
         field = attributes.get('race').form_field()
         self.assertEqual(field.initial[0], Elf)
@@ -164,7 +167,7 @@ class FormsTestCase(unittest.TestCase):
 
     def test_can_create_character_from_form(self):
 
-        form = CharacterForm()
+        form = CharacterForm(session=self.session)
         form.fields['race'].value = 'human'
         form.fields['level'].value = 26
         character = form.process()

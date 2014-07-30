@@ -87,6 +87,10 @@ class BaseAttribute(NameObject, Column):
 
         return descriptions
 
+class StringAttribute(BaseAttribute):
+    data_type = String
+    field = fields.StringField
+
 class IntAttribute(BaseAttribute):
     data_type = Integer
     field = fields.IntegerField
@@ -124,7 +128,17 @@ class SingleChoiceAttribute(BaseAttribute):
             setattr(self.manager.character, self.clsname(), self.value)
 
 
+from utils import random_name
 # Global
+
+class Name(StringAttribute):
+
+    verbose_name = _('Name')
+
+    @property
+    def default_value(self):
+        name = random_name()
+        return name
 
 class Level(IntAttribute):
     default_value = 1
@@ -132,7 +146,6 @@ class Level(IntAttribute):
 
 from registries import attributes
 
-@attributes.register
 class Race(SingleChoiceAttribute):
     chosen = True
     verbose_name = _('Race')

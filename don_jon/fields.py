@@ -35,9 +35,18 @@ class BaseField(object):
         self.change_value(new_value)
         self.blockSignals(False)
 
-    def additional_widgets(self):
-        
-        return tuple()
+
+class StringField(BaseField, QtGui.QLineEdit):
+
+    base_value_changed_signal = 'textChanged'
+
+    @BaseField.value.getter
+    def value(self):
+        return self.text()   
+
+    def change_value(self, new_value):
+        self.setText(new_value)
+
 class IntegerField(BaseField, QtGui.QSpinBox):
 
     base_value_changed_signal = 'valueChanged'

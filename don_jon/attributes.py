@@ -12,6 +12,7 @@ class Empty:
 default_attributes = AttrOrderedDict()
 
 default_attributes['global'] = (
+    Name,
     Level,  
     Race,
 )

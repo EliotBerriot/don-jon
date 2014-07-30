@@ -40,6 +40,9 @@ class DonJon(QtGui.QMainWindow):
 
     @central_widget.setter
     def central_widget(self, new_value):
+        if isinstance(new_value, str):
+            # try to reverse route
+            new_value = reverse(new_value, parent=self)
         self.setCentralWidget(new_value)
 
     def initUI(self):
@@ -48,7 +51,7 @@ class DonJon(QtGui.QMainWindow):
 
         self.toolbar = self.addToolBar(_(u'Personnages'))
         g = ChangeViewAction(
-            icon="character-generate.png", 
+            icon="save-new.png", 
             label=_(u"Créer un personnage"), 
             parent=self,
             toolbar=self.toolbar,

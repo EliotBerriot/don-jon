@@ -4,13 +4,14 @@
 from models import Character
 from PySide import QtGui
 from utils import ugettext_lazy as _
-from settings import database_session as session, database, Base
+from widgets import Icon
 
 class CharacterForm(object):
     enabled_fields = ('global', 'abilities', 'defense')
 
     model = Character
-    def __init__(self, parent=None, instance=None, **kwargs):
+    def __init__(self, session, parent=None, instance=None, **kwargs):
+        self.session = session
         self.parent = parent
         if instance is not None:
             self.instance = instance
@@ -32,8 +33,8 @@ class CharacterForm(object):
             for name, field in self.fields.items():
                 self.instance.attributes.get(name).base_value = field.value
 
-            session.add(self.instance)
-            session.commit()
+            self.session.add(self.instance)
+            self.session.commit()
             return self.instance
         else:
             raise ValidationError 
@@ -42,7 +43,6 @@ class CharacterForm(object):
         self.instance = self.process()
         self.instance.attributes.sync()
         self.sync_field_values()
-        self.instance.display()
 
     def sync_field_values(self):
         for name, field in self.fields.items():
@@ -75,8 +75,10 @@ class CharacterForm(object):
         char = self.process()
         char.attributes.sync()
 
-        char.display()
-
+    def save_and_new(self):
+        """Save current instance and display a form for a new one"""
+        self.save()
+        self.parent.central_widget = "character.create"
 
     def display(self):
         form_layout = QtGui.QVBoxLayout()
@@ -126,9 +128,19 @@ class CharacterForm(object):
             s.setLayout(s_layout)
             form_layout.addWidget(s)
 
-        save = QtGui.QPushButton(_("Sauvegarder"), self.parent)
-        form_layout.addWidget(save)
-        save.clicked.connect(lambda: self.save())
+        actions = QtGui.QGroupBox(_('Actions'))
+        actions_layout = QtGui.QHBoxLayout()
+
+        save_and_edit = QtGui.QPushButton(Icon('save-continue.png'), _(u"Sauvegarder et\ncontinuer l'édition"), self.parent)
+        save_and_edit.clicked.connect(lambda: self.save())
+        actions_layout.addWidget(save_and_edit)
+
+        save_and_new = QtGui.QPushButton(Icon('save-new.png'), _(u"Sauvegarder et\najouter un nouveau"), self.parent)
+        save_and_new.clicked.connect(lambda: self.save_and_new())
+        actions_layout.addWidget(save_and_new)
+
+        actions.setLayout(actions_layout)
+        form_layout.addWidget(actions)
 
         self.sync_field_values()
         return form_layout
