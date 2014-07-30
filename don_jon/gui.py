@@ -28,7 +28,7 @@ import sys
 
 class DonJon(QtGui.QMainWindow):
     
-    default_view = 'character.create'
+    default_view = 'character.list'
     def __init__(self):
         super(DonJon, self).__init__()
         
@@ -43,8 +43,6 @@ class DonJon(QtGui.QMainWindow):
         self.setCentralWidget(new_value)
 
     def initUI(self):
-        self.setMinimumWidth(400)
-        self.setMinimumHeight(400)
         self.setWindowTitle('Don Jon')
         self.setWindowIcon(QtGui.QIcon(get_asset("icon.png")))      
 
@@ -56,6 +54,14 @@ class DonJon(QtGui.QMainWindow):
             toolbar=self.toolbar,
             shortcut='Ctrl+A',
             route='character.create'
+        )
+        g = ChangeViewAction(
+            icon="character-list.png", 
+            label=_(u"Tous les personnages"), 
+            parent=self,
+            toolbar=self.toolbar,
+            shortcut='Ctrl+L',
+            route='character.list'
         )
         
         self.central_widget = reverse(self.default_view, parent=self)

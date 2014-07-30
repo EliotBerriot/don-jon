@@ -4,6 +4,7 @@
 from models import Character
 from PySide import QtGui
 from utils import ugettext_lazy as _
+from settings import database_session as session, database, Base
 
 class CharacterForm(object):
     enabled_fields = ('global', 'abilities', 'defense')
@@ -31,6 +32,8 @@ class CharacterForm(object):
             for name, field in self.fields.items():
                 self.instance.attributes.get(name).base_value = field.value
 
+            session.add(self.instance)
+            session.commit()
             return self.instance
         else:
             raise ValidationError 
@@ -47,6 +50,26 @@ class CharacterForm(object):
 
         for name, field in self.total_value_fields.items():
             field.setText(str(self.instance.attributes.get(name).value))
+            field.setToolTip(self.modifier_tooltip(name))
+
+    def modifier_tooltip(self, name):
+
+        attribute = self.instance.attributes.get(name)
+        lines = []
+        for modifier_name, value in attribute.modifiers_descriptions:
+            value 
+            if type(value) == int:
+                if value > 0:
+                    value = "+{0}".format(value)
+
+            lines.append("{0} : {1}".format(modifier_name, value))
+
+        if not lines:
+            text = "Aucun modificateur"
+        else:
+            text = "Modificateurs\n\n" + "- {0} : {1}\n".join(lines)
+
+        return text
 
     def save(self):
         char = self.process()
@@ -57,7 +80,6 @@ class CharacterForm(object):
 
     def display(self):
         form_layout = QtGui.QVBoxLayout()
-        form_layout.addStretch(1)
 
         for section in self.enabled_fields:
             # Create field groups 
@@ -79,6 +101,7 @@ class CharacterForm(object):
                 # instanciate fields
                 # get label and fields
                 name = attribute_cls.clsname()
+                attribute = self.instance.attributes.get(name)
                 field = self.fields[name]
                 widgets = field.display()
                 column = 0
