@@ -135,6 +135,14 @@ class CharacterTestCase(unittest.TestCase):
         b = Character(race="elf", dexterity=19, constitution=15)
         self.assertEqual(b.attributes.get('dexterity').modifiers_descriptions, [("race", 2)])
         self.assertEqual(b.attributes.get('constitution').modifiers_descriptions, [("race", -2)])
+
+    def test_attributes_modifier_stacks(self):
+        b = Character(race="elf", dexterity=19, constitution=15)
+
+        # dexterity = 19 + elf bonus, so 21
+        # so armor class should be 15
+        self.assertEqual(b.attributes.get('armor_class').value, 15)
+
 class FormsTestCase(unittest.TestCase):
 
     def test_can_build_field_from_attribute(self):
@@ -151,13 +159,13 @@ class FormsTestCase(unittest.TestCase):
 
         field = attributes.get('race').form_field()
 
-        field.value = Human
+        field.value = 'human'
         self.assertEqual(field.currentText(), "Humain")
 
     def test_can_create_character_from_form(self):
 
         form = CharacterForm()
-        form.fields['race'].value = Human
+        form.fields['race'].value = 'human'
         form.fields['level'].value = 26
         character = form.process()
         self.assertEqual(character.attributes.race.raw_value, Human)
