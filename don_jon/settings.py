@@ -8,3 +8,11 @@ Base = declarative_base()
 
 database = create_engine('sqlite:///:memory:')
 database_session = sessionmaker(bind=database)()
+
+import sys, os
+from PySide import QtGui
+
+BASE_DIR = os.path.dirname(os.path.realpath(__file__))
+
+from jinja2 import Environment, PackageLoader
+env = Environment(loader=PackageLoader('don_jon', 'templates'))

@@ -1,3 +1,4 @@
 pyside
 persisting-theory
 sqlalchemy
+jinja2

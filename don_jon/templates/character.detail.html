@@ -1,0 +1,15 @@
+
+<h1>{{ instance.name }}</h1>
+<h2>Caractéristiques</h2>
+
+<table>
+    <tr><th>Caractéristique</th><th>Valeur</th><th>Modificateur</th></tr>
+{% for c in ['strength', 'dexterity', 'constitution', 'intelligence', 'wisdom', 'charisma'] %}
+    <tr>
+        <td>{{ getattr(instance.attributes, c).verbose_name }}</td>
+        <td>{{ getattr(instance.attributes, c).value }}</td>
+        <td>{{ getattr(instance.attributes, c).mod }}</td>
+
+    </tr>
+{% endfor %}
+</table>

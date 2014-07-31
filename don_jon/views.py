@@ -1,8 +1,11 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-from settings import database_session as session, database, Base
+from settings import database_session as session, database, Base, env
 from models import Character
 from utils import ugettext_lazy as _
+from collections import OrderedDict
+import os
+
 class View(object):
     def __init__(self, parent=None, **kwargs):
         super(View, self).__init__()
@@ -39,15 +42,45 @@ class TableItem(QtGui.QTableWidgetItem):
         self.parent = parent
         self.instance = instance
 
-class CharacterDetail(QtGui.QWidget):
-    
-    def __init__(self, instance=None, parent=None):
-        super(CharacterDetail, self).__init__()
-        self.layout = QtGui.QVBoxLayout()
+class ImproperlyConfigured(Exception):
+    pass
+
+class NoSuchTemplate(Exception):
+    pass
+
+class TemplateView(QtGui.QTextBrowser):
+    """API inspired from django"""
+    template_name = ""
+    def __init__(self, *args, **kwargs):
+        self.parent = kwargs.get("parent", None)
+        super(TemplateView, self).__init__(self.parent)
+        if not self.template_name:
+            raise ImproperlyConfigured("Please define a template_name attribute")
+        self.setHtml(self.render_template())
+
+    def render_template(self):
+        try:
+            template = env.get_template(self.template_name)
+        except:
+            raise NoSuchTemplate("Cannot find template '{0} in templates directory".format(self.template_name))
+        return template.render(self.get_context_data())
+
+    def get_context_data(self, **kwargs):
+        return {"getattr": getattr,}
+
+class CharacterDetail(TemplateView):
+
+    template_name = "character.detail.html"
+    def __init__(self, instance=None, **kwargs):
         self.instance = instance
-        self.parent = parent
-        self.layout.addWidget(QtGui.QLabel(self.instance.name))
-        self.setLayout(self.layout)
+        super(CharacterDetail, self).__init__(**kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super(CharacterDetail, self).get_context_data(**kwargs)
+        context["instance"] = self.instance
+
+        return context
+
 
 class CharacterList(View, QtGui.QWidget):
     fields = ('name', 'level', 'race', 'id', )
@@ -69,13 +102,14 @@ class CharacterList(View, QtGui.QWidget):
 
         self.list.setSortingEnabled(True)
         self.list.setEditTriggers(QtGui.QAbstractItemView.NoEditTriggers)
-        self.list.cellClicked.connect(self.update_sidebar)
+        self.list.itemClicked.connect(self.update_sidebar)
         self.layout.addWidget(self.list)
 
         self.setLayout(self.layout) 
 
-    def update_sidebar(self, row, column):
-        instance = self.list.itemAt(row, column).instance
+    def update_sidebar(self, item):
+        widget = item
+        instance = widget.instance
         if self.current_sidebar is not None:
             self.layout.removeWidget(self.current_sidebar)
             self.current_sidebar.setParent(None)
