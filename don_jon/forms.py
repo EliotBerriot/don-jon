@@ -28,18 +28,23 @@ class CharacterForm(object):
     def validate(self):
         return True
 
-    def process(self):
+    def process(self, save=False):
         if self.validate():
             for name, field in self.fields.items():
                 self.instance.attributes.get(name).base_value = field.value
 
-            self.session.add(self.instance)
-            self.session.commit()
+            if save:
+                if self.instance.id is not None:
+                    self.instance = self.session.merge(self.instance)
+                    print('item merged')
+                else:
+                    self.session.add(self.instance)
+                self.session.commit()
             return self.instance
         else:
             raise ValidationError 
 
-    def update(self):
+    def update(self,):
         self.instance = self.process()
         self.instance.attributes.sync()
         self.sync_field_values()
@@ -72,7 +77,7 @@ class CharacterForm(object):
         return text
 
     def save(self):
-        char = self.process()
+        char = self.process(save=True)
         char.attributes.sync()
 
     def save_and_new(self):

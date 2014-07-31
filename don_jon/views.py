@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 from settings import database_session as session, database, Base, env
 from models import Character
-from utils import ugettext_lazy as _
+from utils import ugettext_lazy as _, reverse
 from collections import OrderedDict
 import os
 
@@ -28,9 +28,10 @@ from forms import CharacterForm
 
 class CharacterCreate(View, QtGui.QWidget):
     def __init__(self, *args, **kwargs):
+        instance = kwargs.pop('instance', None)
         super(CharacterCreate, self).__init__(*args, **kwargs)
         self.layout = QtGui.QVBoxLayout() 
-        self.layout.addLayout(CharacterForm(session=session, parent=self.parent).display())
+        self.layout.addLayout(CharacterForm(session=session, parent=self.parent, instance=instance).display())
         self.setLayout(self.layout) 
 
     def process(self, **kwargs):
@@ -103,6 +104,7 @@ class CharacterList(View, QtGui.QWidget):
         self.list.setSortingEnabled(True)
         self.list.setEditTriggers(QtGui.QAbstractItemView.NoEditTriggers)
         self.list.itemClicked.connect(self.update_sidebar)
+        self.list.itemDoubleClicked.connect(self.edit_character)
         self.layout.addWidget(self.list)
 
         self.setLayout(self.layout) 
@@ -116,6 +118,15 @@ class CharacterList(View, QtGui.QWidget):
 
         self.current_sidebar = CharacterDetail(instance=instance, parent=self)
         self.layout.addWidget(self.current_sidebar)
+
+    def edit_character(self, item):
+        try:
+            instance = item.instance
+        except:
+            intance = None
+        if instance is not None:
+            print(instance.name)
+            self.parent.central_widget = reverse('character.create', instance=instance, parent=self.parent)
 
     def get_queryset(self):
         try:
