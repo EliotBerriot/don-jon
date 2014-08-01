@@ -1,11 +1,11 @@
 from utils import AttrDict, AttrOrderedDict
 from builtin_attributes import *
 from races import *
-from registries import attributes, races, ManagedAttributes
+from classes import *
+from registries import attributes, races, classes, ManagedAttributes
 import sys
 
-attributes.autodiscover(apps=('don_jon',))
-races.autodiscover(apps=('don_jon',))
+
 class Empty:
     pass
 
@@ -15,6 +15,7 @@ default_attributes['global'] = (
     Name,
     Level,  
     Race,
+    Class
 )
 
 default_attributes['defense'] = (

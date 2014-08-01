@@ -12,7 +12,7 @@ from don_jon.models import Character, CharacterGenerator
 from don_jon.races import Elf, Human
 from don_jon.registries import attributes, races, routes
 from don_jon.forms import CharacterForm
-from don_jon.utils import reverse
+from don_jon.utils import reverse, get_modifier_function
 from don_jon import gui
 from don_jon.settings import test_database, Base
 from sqlalchemy.orm import sessionmaker
@@ -141,6 +141,19 @@ class CharacterTestCase(unittest.TestCase):
         # dexterity = 19 + elf bonus, so 21
         # so armor class should be 15
         self.assertEqual(b.attributes.get('armor_class').value, 15)
+
+    def test_can_get_modifier_function(self):
+        m = get_modifier_function("+", 13)
+        self.assertEqual(m(1), 14)
+
+        m = get_modifier_function("-", 13)
+        self.assertEqual(m(14), 1)
+
+        m = get_modifier_function("*", 4)
+        self.assertEqual(m(4), 16)
+
+        m = get_modifier_function("/", 2)
+        self.assertEqual(m(12), 6)
 
 class FormsTestCase(unittest.TestCase):
 

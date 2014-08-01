@@ -7,7 +7,7 @@
     </style>
 </head>
 <body>
-    <h1>{{ instance.name }} - {{ instance.attributes.get('race').raw_value.verbose_name }} niveau {{ instance.level }}</h1>
+    <h1>{{ instance.name }} - {{ instance.attributes.get('class').raw_value.verbose_name }} {{ instance.attributes.get('race').raw_value.verbose_name }} niveau {{ instance.level }}</h1>
     <h2>Caractéristiques</h2>
 
     <table>

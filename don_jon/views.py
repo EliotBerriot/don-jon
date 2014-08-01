@@ -105,7 +105,7 @@ class CharacterDetail(TemplateView):
 
 
 class CharacterList(View, QtGui.QWidget):
-    fields = ('id', 'name', 'level', 'race' )
+    fields = ('name', 'level', 'race', 'class')
     def __init__(self, *args, **kwargs):
         super(CharacterList, self).__init__(*args, **kwargs)
         self.layout = QtGui.QHBoxLayout()

@@ -27,6 +27,7 @@ class SpecificAttributes(Attributes):
 
    pass
 
+
 class Races(Registry):
 
     look_into = "races"
@@ -35,6 +36,17 @@ class Races(Registry):
         return data.clsname()
 
 races = Races()
+
+
+class Classes(Registry):
+
+    look_into = "classes"
+    
+    def prepare_name(self, data, name=None):
+        print('prepare', data, name)
+        return data.clsname()
+
+classes = Classes()
 
 
 from routing import Route

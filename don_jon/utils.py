@@ -69,3 +69,16 @@ def random_name(name_file="general"):
     m = molecular.Molecule()
     m.load(name_file+".nam")
     return m.name()
+
+def get_modifier_function(operator="+", value=2):
+    """Returns a function that can be used as a modifier"""
+    def mod(original_value, character=None):
+        if operator == "+":
+            return original_value + value
+        if operator == "-":
+            return original_value - value
+        if operator == "*":
+            return original_value * value
+        if operator == "/":
+            return original_value / value
+    return mod

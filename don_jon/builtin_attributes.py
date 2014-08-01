@@ -6,7 +6,7 @@ import fields
 from utils import ugettext_lazy as _
 from sqlalchemy import Column, Integer, String, ForeignKey
 from sqlalchemy.orm import relationship, backref
-from registries import Modifiers, races as races_registry
+from registries import Modifiers, races as races_registry, classes as classes_registry
 
 class BaseAttribute(NameObject, Column):
     
@@ -53,7 +53,7 @@ class BaseAttribute(NameObject, Column):
         """
         v = self.base_value
         for modifier_name, modifier in self.modifiers.items():
-            v = modifier(v)
+            v = modifier(v, self.manager.character)
         return v
 
     def __str__(self):
@@ -82,11 +82,12 @@ class BaseAttribute(NameObject, Column):
         b = self.base_value
         descriptions = []
         for modifier_name, modifier in self.modifiers.items():
-            mod_value = modifier(b) - b
+            mod_value = modifier(b, self.manager.character) - b
             descriptions.append((modifier_name, mod_value))
 
         return descriptions
 
+    
 class StringAttribute(BaseAttribute):
     data_type = String
     field = fields.StringField
@@ -161,6 +162,20 @@ class Race(SingleChoiceAttribute):
         
         return races_registry.values()
         
+
+class Class(SingleChoiceAttribute):
+    chosen = True
+    verbose_name = _('Classe')
+    data_type = String
+    default_value = "warrior"
+
+    def get_choices(self):
+        r = classes_registry.items()
+        return r
+
+    def get_initial_data(self, **kwargs):
+        
+        return classes_registry.values()
 # Abilities 
 
 class Ability(IntAttribute):
@@ -188,7 +203,7 @@ class Dexterity(Ability):
     }
     
 
-    def dex_bonus(self, original_value, **kwargs):
+    def dex_bonus(self, original_value, *args, **kwargs):
         return original_value + self.mod
 
 class Constitution(Ability):
