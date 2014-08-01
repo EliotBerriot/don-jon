@@ -11,6 +11,7 @@ class CharacterForm(object):
 
     model = Character
     def __init__(self, session, parent=None, instance=None, **kwargs):
+        self.sidebar_callback = kwargs.get('sidebar_callback', None)
         self.session = session
         self.parent = parent
         if instance is not None:
@@ -36,13 +37,15 @@ class CharacterForm(object):
             if save:
                 if self.instance.id is not None:
                     self.instance = self.session.merge(self.instance)
-                    print('item merged')
                 else:
                     self.session.add(self.instance)
                 self.session.commit()
+            if self.sidebar_callback is not None:
+                self.sidebar_callback()
             return self.instance
         else:
             raise ValidationError 
+
 
     def update(self,):
         self.instance = self.process()

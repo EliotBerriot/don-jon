@@ -4,7 +4,7 @@ from settings import Base
 from meta import classmaker
 
 from sqlalchemy import Column, Integer, String
-from sqlalchemy.orm import synonym
+from sqlalchemy.orm import synonym, reconstructor
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.declarative.api import DeclarativeMeta
 from sqlalchemy.ext.hybrid import hybrid_property
@@ -47,7 +47,14 @@ class Character(NameObject, Base):
     def __init__(self, *args, **kwargs):        
         NameObject.__init__(self)
         Base.__init__(self, *args, **kwargs)
+        self.setup(**kwargs)
+
+    def setup(self, **kwargs):
         self.attributes = AttributesManager(character=self, **kwargs)
+
+    @reconstructor
+    def init_on_load(self):
+        self.setup()
 
     def display(self):
 

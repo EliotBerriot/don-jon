@@ -28,14 +28,31 @@ from forms import CharacterForm
 
 class CharacterCreate(View, QtGui.QWidget):
     def __init__(self, *args, **kwargs):
+        self.current_sidebar = None
         instance = kwargs.pop('instance', None)
         super(CharacterCreate, self).__init__(*args, **kwargs)
-        self.layout = QtGui.QVBoxLayout() 
-        self.layout.addLayout(CharacterForm(session=session, parent=self.parent, instance=instance).display())
+        self.layout = QtGui.QHBoxLayout() 
+        self.form = CharacterForm(
+            session=session, 
+            parent=self.parent, 
+            instance=instance, 
+            sidebar_callback=self.update_sidebar
+        )
+        self.layout.addLayout(self.form.display())
         self.setLayout(self.layout) 
+        self.update_sidebar()
+
+    def update_sidebar(self):
+        if self.current_sidebar is not None:
+            self.layout.removeWidget(self.current_sidebar)
+            self.current_sidebar.setParent(None)
+
+        self.current_sidebar = CharacterDetail(instance=self.form.instance, parent=self)
+        self.layout.addWidget(self.current_sidebar)
 
     def process(self, **kwargs):
         return self
+
 
 class TableItem(QtGui.QTableWidgetItem):
     def __init__(self, content, instance, parent):
@@ -84,7 +101,7 @@ class CharacterDetail(TemplateView):
 
 
 class CharacterList(View, QtGui.QWidget):
-    fields = ('name', 'level', 'race', 'id', )
+    fields = ('id', 'name', 'level', 'race' )
     def __init__(self, *args, **kwargs):
         super(CharacterList, self).__init__(*args, **kwargs)
         self.layout = QtGui.QHBoxLayout()
@@ -125,7 +142,6 @@ class CharacterList(View, QtGui.QWidget):
         except:
             intance = None
         if instance is not None:
-            print(instance.name)
             self.parent.central_widget = reverse('character.create', instance=instance, parent=self.parent)
 
     def get_queryset(self):
