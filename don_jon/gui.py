@@ -69,6 +69,7 @@ class DonJon(QtGui.QMainWindow):
         
         self.central_widget = reverse(self.default_view, parent=self)
         self.show()
+        #self.showFullScreen()
 
     def generateCharacter(self):
         self.setCentralWidget(GenerateCharacter())

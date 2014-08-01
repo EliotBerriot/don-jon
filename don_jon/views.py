@@ -1,9 +1,10 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-from settings import database_session as session, database, Base, env
+from settings import database_session as session, database, Base, env, BASE_DIR
 from models import Character
 from utils import ugettext_lazy as _, reverse
 from collections import OrderedDict
+import PySide.QtWebKit
 import os
 
 class View(object):
@@ -38,7 +39,7 @@ class CharacterCreate(View, QtGui.QWidget):
             instance=instance, 
             sidebar_callback=self.update_sidebar
         )
-        self.layout.addLayout(self.form.display())
+        self.layout.addWidget(self.form.display())
         self.setLayout(self.layout) 
         self.update_sidebar()
 
@@ -66,7 +67,7 @@ class ImproperlyConfigured(Exception):
 class NoSuchTemplate(Exception):
     pass
 
-class TemplateView(QtGui.QTextBrowser):
+class TemplateView(PySide.QtWebKit.QWebView):
     """API inspired from django"""
     template_name = ""
     def __init__(self, *args, **kwargs):
@@ -81,10 +82,13 @@ class TemplateView(QtGui.QTextBrowser):
             template = env.get_template(self.template_name)
         except:
             raise NoSuchTemplate("Cannot find template '{0} in templates directory".format(self.template_name))
-        return template.render(self.get_context_data())
+        output = template.render(self.get_context_data())
+        return output
 
     def get_context_data(self, **kwargs):
-        return {"getattr": getattr,}
+        with open(os.path.join(BASE_DIR, 'static', 'style.css'), 'r') as content_file:
+            css = content_file.read()
+        return {"getattr": getattr, "css": css}
 
 class CharacterDetail(TemplateView):
 

@@ -89,6 +89,7 @@ class CharacterForm(object):
         self.parent.central_widget = "character.create"
 
     def display(self):
+        form = QtGui.QWidget()
         form_layout = QtGui.QVBoxLayout()
 
         for section in self.enabled_fields:
@@ -151,4 +152,7 @@ class CharacterForm(object):
         form_layout.addWidget(actions)
 
         self.sync_field_values()
-        return form_layout
+        form.setLayout(form_layout)
+        scroll_area = QtGui.QScrollArea()
+        scroll_area.setWidget(form)
+        return scroll_area

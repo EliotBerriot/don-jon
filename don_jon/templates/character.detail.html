@@ -1,15 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <style type="text/css">
+        {{ css }}
+    </style>
+</head>
+<body>
+    <h1>{{ instance.name }} - {{ instance.attributes.get('race').raw_value.verbose_name }} niveau {{ instance.level }}</h1>
+    <h2>Caractéristiques</h2>
 
-<h1>{{ instance.name }} - {{ instance.attributes.get('race').raw_value.verbose_name }} niveau {{ instance.level }}</h1>
-<h2>Caractéristiques</h2>
+    <table>
+        <tr><th>Caractéristique</th><th>Valeur</th><th>Modificateur</th></tr>
+    {% for c in ['strength', 'dexterity', 'constitution', 'intelligence', 'wisdom', 'charisma'] %}
+        <tr>
+            <td>{{ getattr(instance.attributes, c).verbose_name }}</td>
+            <td>{{ getattr(instance.attributes, c).value }}</td>
+            <td>{{ getattr(instance.attributes, c).mod }}</td>
 
-<table>
-    <tr><th>Caractéristique</th><th>Valeur</th><th>Modificateur</th></tr>
-{% for c in ['strength', 'dexterity', 'constitution', 'intelligence', 'wisdom', 'charisma'] %}
-    <tr>
-        <td>{{ getattr(instance.attributes, c).verbose_name }}</td>
-        <td>{{ getattr(instance.attributes, c).value }}</td>
-        <td>{{ getattr(instance.attributes, c).mod }}</td>
-
-    </tr>
-{% endfor %}
-</table>
+        </tr>
+    {% endfor %}
+    </table>
+    
+</body>
+</html>
