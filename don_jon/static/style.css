@@ -5,3 +5,20 @@ body {
 h1 {
     border-bottom: 1px solid black;
 }
+
+table {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+th:first-child {
+    text-align: left;
+}
+td, th {
+    border-bottom: 1px solid black;
+    margin: 0;
+    padding: 0.5rem;
+}
+td:not(:first-child) {
+    text-align: center;
+}

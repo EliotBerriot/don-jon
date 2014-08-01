@@ -1,4 +1,5 @@
 from PySide import QtGui, QtCore
+from widgets import Icon
 
 class BaseField(object):
     label = ""
@@ -12,6 +13,7 @@ class BaseField(object):
     def __init__(self, *args, **kwargs):
         self.label = kwargs.get('label', '')
         self.initial = kwargs.get('initial')
+        self.attribute = kwargs.get('attribute')
         super(BaseField, self).__init__()
         self.default = kwargs.get('default')
         if self.default is not None:
@@ -19,8 +21,17 @@ class BaseField(object):
 
         getattr(self, self.base_value_changed_signal).connect(self.emit_value_changed)
 
+    def randomize(self):
+        self.value = self.attribute.roll()
+
     def display(self, **kwargs):
-        return self.label + " : ", self
+        widgets = [self.label + " : ", self]
+        if self.attribute.random:
+            randomize = QtGui.QPushButton(Icon('dice.png'), u"Relancer")
+            randomize.clicked.connect(lambda: self.randomize())        
+            
+            widgets.append(randomize)
+        return widgets
 
     def emit_value_changed(self, *args, **kwargs):
         self.value_changed.emit()
@@ -51,6 +62,10 @@ class IntegerField(BaseField, QtGui.QSpinBox):
 
     base_value_changed_signal = 'valueChanged'
 
+    def __init__(self, *args, **kwargs):
+        super(IntegerField, self).__init__(*args, **kwargs)
+        self.setMinimum(1)
+        self.setMaximum(999999)
 
     @BaseField.value.getter
     def value(self):

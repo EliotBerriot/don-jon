@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-from utils import NameObject
+from utils import NameObject, D
 import fields
 from utils import ugettext_lazy as _
 from sqlalchemy import Column, Integer, String, ForeignKey
@@ -17,7 +17,8 @@ class BaseAttribute(NameObject, Column):
     initial = None
     data_type = Integer
     _base_value = None
-
+    random = False
+    readonly = False
     def __init__(self, *args, **kwargs):
         self.modifiers = Modifiers()
         self.section = kwargs.pop('section', None)
@@ -27,7 +28,7 @@ class BaseAttribute(NameObject, Column):
         if kwargs.get('base_value') is not None:
             self.base_value = kwargs.get('base_value')
         else:
-            self.base_value = self.default_value
+            self.base_value = self.get_default_value()
 
     def _constructor(self, name, type_, **kwargs):
         """Needed by SQLAlchemy"""
@@ -45,6 +46,9 @@ class BaseAttribute(NameObject, Column):
             # update model value
             setattr(self.manager.character, self.clsname(), self.value)
 
+    def roll(self):
+        """generate a random value for this attribute"""
+        raise NotImplementedError
 
     @property
     def value(self):
@@ -73,7 +77,9 @@ class BaseAttribute(NameObject, Column):
         return self.field(
             initial=self.get_initial_data(), 
             default=self.get_default_value(),
-            label=self.verbose_name)
+            label=self.verbose_name,
+            attribute=self
+        )
 
 
     @property
@@ -144,6 +150,26 @@ class Name(StringAttribute):
 class Level(IntAttribute):
     default_value = 1
     verbose_name = _('Niveau')
+
+class Speed(IntAttribute):
+    default_value = 9
+    verbose_name = _('Vitesse')
+    readonly = True
+
+class LifePoints(IntAttribute):
+    verbose_name = _('Points de vie')
+    default_value = 1
+    random = True
+
+    def roll(self):
+        total = 0
+        for i in range(1, self.manager.character.level+1):
+            add = D(self.manager.character.attributes.get('class').raw_value.life_dice).value
+            add += self.manager.character.attributes.get('constitution').mod
+            if add <= 0:
+                add = 1
+            total += add
+        return total
 
 from registries import attributes
 

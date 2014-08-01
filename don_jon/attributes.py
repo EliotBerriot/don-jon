@@ -15,7 +15,9 @@ default_attributes['global'] = (
     Name,
     Level,  
     Race,
-    Class
+    Class,
+    LifePoints,
+    Speed
 )
 
 default_attributes['defense'] = (

@@ -22,7 +22,8 @@ class CharacterForm(object):
         self.fields = {}
         for section in self.enabled_fields:
             for attribute_cls in self.instance.attributes.attributes_cls.get(section, []):
-                self.fields[attribute_cls.clsname()] = self.instance.attributes.get(attribute_cls.clsname()).form_field()
+                if not attribute_cls.readonly:
+                    self.fields[attribute_cls.clsname()] = self.instance.attributes.get(attribute_cls.clsname()).form_field()
                 
         self.total_value_fields = {}
 
@@ -109,31 +110,33 @@ class CharacterForm(object):
                 row = 1
 
             for attribute_cls in self.instance.attributes.attributes_cls.get(section, []):
-                # instanciate fields
-                # get label and fields
-                name = attribute_cls.clsname()
-                attribute = self.instance.attributes.get(name)
-                field = self.fields[name]
-                widgets = field.display()
-                column = 0
+                if not attribute_cls.readonly:
+               
+                    # instanciate fields
+                    # get label and fields
+                    name = attribute_cls.clsname()
+                    attribute = self.instance.attributes.get(name)
+                    field = self.fields[name]
+                    widgets = field.display()
+                    column = 0
 
-                for widget in widgets:
-                    # Widget is just a string, so create a label
-                    if isinstance(widget, str) or isinstance(widget, unicode):
-                        widget = QtGui.QLabel(widget)
+                    for widget in widgets:
+                        # Widget is just a string, so create a label
+                        if isinstance(widget, str) or isinstance(widget, unicode):
+                            widget = QtGui.QLabel(widget)
 
-                    s_layout.addWidget(widget, row, column)                    
-                    column += 1
+                        s_layout.addWidget(widget, row, column)                    
+                        column += 1
 
-                    # Add signal to keep field value synced with character changes
-                    if hasattr(widget, 'keep_synced') and widget.keep_synced and hasattr(widget, 'value_changed'):
-                        widget.value_changed.connect(self.update)
+                        # Add signal to keep field value synced with character changes
+                        if hasattr(widget, 'keep_synced') and widget.keep_synced and hasattr(widget, 'value_changed'):
+                            widget.value_changed.connect(self.update)
 
-                    if total_enabled:
-                        total_value_widget = QtGui.QLabel(str(self.instance.attributes.get(name).value))
-                        self.total_value_fields[name] = total_value_widget
-                        s_layout.addWidget(total_value_widget, row, column)
-                row += 1
+                        if total_enabled:
+                            total_value_widget = QtGui.QLabel(str(self.instance.attributes.get(name).value))
+                            self.total_value_fields[name] = total_value_widget
+                            s_layout.addWidget(total_value_widget, row, column)
+                    row += 1
             s.setLayout(s_layout)
             form_layout.addWidget(s)
 
